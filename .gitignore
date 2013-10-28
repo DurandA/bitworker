@@ -7,6 +7,8 @@
 # Ignore Javadoc output
 /doc/*
 
+/bin/*
+
 # Ignore any eventual Eclipse project files, these don't belong in the
 # repository.
 /.classpath
