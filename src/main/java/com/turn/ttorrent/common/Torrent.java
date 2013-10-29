@@ -15,10 +15,6 @@
  */
 package com.turn.ttorrent.common;
 
-import com.turn.ttorrent.bcodec.BDecoder;
-import com.turn.ttorrent.bcodec.BEValue;
-import com.turn.ttorrent.bcodec.BEncoder;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -52,6 +48,10 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.turn.ttorrent.bcodec.BDecoder;
+import com.turn.ttorrent.bcodec.BEValue;
+import com.turn.ttorrent.bcodec.BEncoder;
 
 /**
  * A torrent file tracked by the controller's BitTorrent tracker.
@@ -665,6 +665,53 @@ public class Torrent {
 		BEncoder.bencode(new BEValue(torrent), baos);
 		return new Torrent(baos.toByteArray(), true);
 	}
+	
+	
+	/**
+	 * @author Thomas Rouvinez
+	 * 
+	 * Function to create a new torrent with specific information for rainbow tables.
+	 * @param description
+	 * @return an encoded torrent.
+	 */
+	public static Torrent create(TorrentInfo description)
+	{
+		Map<String, BEValue> torrent = new HashMap<String, BEValue>();
+
+		try {
+			// Set the information.
+			torrent.put("info", new BEValue(description.createInfo()));
+			
+			// Set the announce.
+			torrent.put("announce", new BEValue(description.getAnnounce().toString()));
+			
+			// Set the announce list.
+			if (description.getAnnounceList() != null) {
+				torrent.put("announce-list", new BEValue(description.createAnnounceList()));
+			}
+			
+			// Set the rest of the fields.
+			torrent.put("hash algorithm", new BEValue(description.getHashAlgorithm()));
+			torrent.put("charset", new BEValue(description.getCharset()));
+			torrent.put("plaintext min", new BEValue(String.valueOf(description.getPlaintextLenMin())));
+			torrent.put("plaintext max", new BEValue(String.valueOf(description.getPlaintextLenMax())));
+			torrent.put("chain len", new BEValue(String.valueOf(description.getChainLen())));
+			torrent.put("creation date", new BEValue(new Date().getTime() / 1000));
+			if(description.getComment() != null) {torrent.put("comment", new BEValue(description.getComment()));}
+			torrent.put("created by", new BEValue(description.getCreatedBy()));
+			
+			// Return the encoded torrent file.
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			BEncoder.bencode(new BEValue(torrent), baos);
+			return new Torrent(baos.toByteArray(), true);
+			
+		} catch (IllegalArgumentException | IOException e) {
+			e.printStackTrace();
+			
+			return null;
+		}
+	}
+	
 
 	/**
 	 * A {@link Callable} to hash a data chunk.
@@ -709,12 +756,12 @@ public class Torrent {
 	 *
 	 * @param file The file to hash.
 	 */
-	private static String hashFile(File file)
+	public static String hashFile(File file)
 		throws InterruptedException, IOException {
 		return Torrent.hashFiles(Arrays.asList(new File[] { file }));
 	}
 
-	private static String hashFiles(List<File> files)
+	public static String hashFiles(List<File> files)
 		throws InterruptedException, IOException {
 		int threads = getHashingThreadsCount();
 		ExecutorService executor = Executors.newFixedThreadPool(threads);
