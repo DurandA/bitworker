@@ -608,7 +608,7 @@ public class SharingPeer extends Peer implements MessageListener {
 						// we should validate the piece.
 						if (piece.getOffset() + piece.getBlock().capacity()
 								== p.size()) {
-							p.validate();
+							//p.validate();
 							this.firePieceCompleted(p);
 							this.requestedPiece = null;
 							this.firePeerReady();

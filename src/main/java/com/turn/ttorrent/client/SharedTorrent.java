@@ -308,6 +308,9 @@ public class SharedTorrent extends Torrent implements PeerActivityListener {
 	}
 
 	/**
+	 * @author mpetazzoni
+	 * @author Arnaud Durand
+	 * 
 	 * Build this torrent's pieces array.
 	 *
 	 * <p>
@@ -349,19 +352,27 @@ public class SharedTorrent extends Torrent implements PeerActivityListener {
 				// length. Let's make sure we get the right piece length in any
 				// situation.
 				long off = ((long)idx) * this.pieceLength;
+				
+				// RTTorrents have same piece length for any piece
+				/*
 				long len = Math.min(
 					this.bucket.size() - off,
-					this.pieceLength);
+					this.pieceLength);*/
+				long len = this.pieceLength;
 
+				/*
 				this.pieces[idx] = new Piece(this.bucket, idx, off, len, hash,
 					this.isSeeder());
-
-				Callable<Piece> hasher = new Piece.CallableHasher(this.pieces[idx]);
+				*/
+				this.pieces[idx] = new Piece(this.bucket, idx, off, len, /*hash,*/
+						this.isSeeder());
+				
+				/*Callable<Piece> hasher = new Piece.CallableHasher(this.pieces[idx]);
 				results.add(executor.submit(hasher));
 
 				if (results.size() >= threads) {
 					this.validatePieces(results);
-				}
+				}*/
 
 				if (idx / (float)nPieces * 100f > step) {
 					logger.info("  ... {}% complete", step);

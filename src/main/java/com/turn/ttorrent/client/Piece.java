@@ -45,6 +45,7 @@ import org.slf4j.LoggerFactory;
  * </p>
  *
  * @author mpetazzoni
+ * @author Arnaud Durand
  */
 public class Piece implements Comparable<Piece> {
 
@@ -55,13 +56,42 @@ public class Piece implements Comparable<Piece> {
 	private final int index;
 	private final long offset;
 	private final long length;
-	private final byte[] hash;
+	//private final byte[] hash;
 	private final boolean seeder;
 
 	private volatile boolean valid;
 	private int seen;
 	private ByteBuffer data;
 
+	/**
+	 * Initialize a new piece in the byte bucket.
+	 * 
+	 * @author Arnaud Durand
+	 * @param bucket The underlying byte storage bucket.
+	 * @param index This piece index in the torrent.
+	 * @param offset This piece offset, in bytes, in the storage.
+	 * @param length This piece length, in bytes.
+	 * @param seeder Whether we're seeding this torrent or not (disables piece
+	 * validation).
+	 */
+	public Piece(TorrentByteStorage bucket, int index, long offset,
+		long length, boolean seeder) {
+		this.bucket = bucket;
+		this.index = index;
+		this.offset = offset;
+		this.length = length;
+		this.seeder = seeder;
+
+		// Piece is considered invalid until first check.
+		//this.valid = false;
+
+		// Piece start unseen
+		this.seen = 0;
+
+		this.data = null;
+	}
+	
+	
 	/**
 	 * Initialize a new piece in the byte bucket.
 	 *
@@ -73,7 +103,7 @@ public class Piece implements Comparable<Piece> {
 	 * @param seeder Whether we're seeding this torrent or not (disables piece
 	 * validation).
 	 */
-	public Piece(TorrentByteStorage bucket, int index, long offset,
+	/*public Piece(TorrentByteStorage bucket, int index, long offset,
 		long length, byte[] hash, boolean seeder) {
 		this.bucket = bucket;
 		this.index = index;
@@ -89,8 +119,8 @@ public class Piece implements Comparable<Piece> {
 		this.seen = 0;
 
 		this.data = null;
-	}
-
+	}*/
+	
 	/**
 	 * Tells whether this piece's data is valid or not.
 	 */
@@ -148,7 +178,7 @@ public class Piece implements Comparable<Piece> {
 	 * storage, is valid, i.e. its SHA1 sum matches the one from the torrent
 	 * meta-info.
 	 */
-	public synchronized boolean validate() throws IOException {
+	/*public synchronized boolean validate() throws IOException {
 		if (this.seeder) {
 			logger.trace("Skipping validation of {} (seeder mode).", this);
 			this.valid = true;
@@ -164,7 +194,7 @@ public class Piece implements Comparable<Piece> {
 		this.valid = Arrays.equals(Torrent.hash(data), this.hash);
 
 		return this.isValid();
-	}
+	}*/
 
 	/**
 	 * Internal piece data read function.
@@ -306,7 +336,7 @@ public class Piece implements Comparable<Piece> {
 
 		@Override
 		public Piece call() throws IOException {
-			this.piece.validate();
+			//this.piece.validate();
 			return this.piece;
 		}
 	}
