@@ -379,17 +379,11 @@ public class Torrent {
 					localPath.append(File.separator)
 						.append(pathElement.getString());
 				}
+				
 				this.files.add(new TorrentFile(
 					new File(this.name, localPath.toString()),
 					fileInfo.get("length").getLong()));
 			}
-		} 
-		else {
-			// For single-file torrents, the name of the torrent is
-			// directly the name of the file.
-			this.files.add(new TorrentFile(
-				new File(this.name),
-				this.decoded_info.get("length").getLong()));
 		}
 
 		// -------------------------------------------------------------------------------------------
@@ -401,30 +395,8 @@ public class Torrent {
 		for (TorrentFile file : this.files) {
 			size += file.size;
 		}
+		
 		this.size = size;
-
-		logger.info("  Announced at:" + (this.trackers.size() == 0 ? " Seems to be trackerless" : ""));
-		for (int i=0; i < this.trackers.size(); i++) {
-			List<URI> tier = this.trackers.get(i);
-			for (int j=0; j < tier.size(); j++) {
-				logger.info("    {}{}",
-					(j == 0 ? String.format("%2d. ", i+1) : "    "),
-					tier.get(j));
-			}
-		}
-
-		// Get MultiFile if existing.
-		if (this.isMultifile()) {
-			int i = 0;
-			for (TorrentFile file : this.files) {
-				logger.debug("    {}. {} ({} byte(s))",
-					new Object[] {
-						String.format("%2d", ++i),
-						file.file.getPath(),
-						String.format("%,d", file.size)
-					});
-			}
-		}
 		
 		// -------------------------------------------------------------------------------------------
 		// Store information into our RTTorrent file.
@@ -442,6 +414,7 @@ public class Torrent {
 		info.setLength(this.size);
 		info.setPieceLength(pieceLength);
 		info.setLength(size);
+		info.setFiles(this.files);
 	}
 	
 	// ------------------------------------------------------------------------------------------------
@@ -830,60 +803,6 @@ public class Torrent {
 		BEncoder.bencode(new BEValue(torrent), baos);
 		return new Torrent(baos.toByteArray(), true);
 	}
-	
-	// ----------------------------------------------------------------------------------------------
-	// Start of modification.
-	// ----------------------------------------------------------------------------------------------
-	
-	/**
-	 * @author Thomas Rouvinez
-	 * 
-	 * Function to create a new torrent with specific information for rainbow tables.
-	 * @param description
-	 * @return an encoded torrent.
-	 */
-	public static Torrent create(RTTorrent description)
-	{
-		Map<String, BEValue> torrent = new HashMap<String, BEValue>();
-
-		try {
-			// Set the information.
-			torrent.put("info", new BEValue(description.createInfo()));
-			
-			// Set the announce.
-			torrent.put("announce", new BEValue(description.getAnnounce().toString()));
-			
-			// Set the announce list.
-			if (description.getAnnounceList() != null) {
-				torrent.put("announce-list", new BEValue(description.createAnnounceList()));
-			}
-			
-			// Set the rest of the fields.
-			torrent.put("hash algorithm", new BEValue(description.getHashAlgorithm()));
-			torrent.put("charset", new BEValue(description.getCharset()));
-			torrent.put("plaintext min", new BEValue(description.getPlaintextLenMin()));
-			torrent.put("plaintext max", new BEValue(description.getPlaintextLenMax()));
-			torrent.put("chain len", new BEValue(description.getChainLen()));
-			torrent.put("creation date", new BEValue(new Date().getTime() / 1000));
-			if(description.getComment() != null) {torrent.put("comment", new BEValue(description.getComment()));}
-			if(description.getCreatedBy() != null) {torrent.put("created by", new BEValue(description.getCreatedBy()));}
-			
-			// Return the encoded torrent file.
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			BEncoder.bencode(new BEValue(torrent), baos);
-			return new Torrent(baos.toByteArray(), true);
-			
-		} catch (IllegalArgumentException | IOException e) {
-			e.printStackTrace();
-			
-			return null;
-		}
-	}
-	
-	// ----------------------------------------------------------------------------------------------
-	// End of modification.
-	// ----------------------------------------------------------------------------------------------
-	
 
 	/**
 	 * A {@link Callable} to hash a data chunk.

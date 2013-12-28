@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import com.turn.ttorrent.bcodec.BEValue;
+import com.turn.ttorrent.common.Torrent.TorrentFile;
 
 /**
  * 
@@ -37,7 +38,7 @@ public class RTTorrent{
 	/**
 	 * A list of dictionaries, one dictionary for each file in the torrent, which is described in the next table.
 	 */
-	private List<File> files = null;
+	private List<TorrentFile> files = null;
 
 	/**
 	 * The length of the file, in bytes. Should be multiple of 16 (bytes). Used to calculate chain_num. Should be 
@@ -136,74 +137,6 @@ public class RTTorrent{
 		setParent(Parent);
 	}
 
-	/**
-	 * Function to compile together the fields required for the info tag.
-	 * @return a map with file information for the torrent.
-	 */
-	public Map<String, BEValue> createInfo(){
-		Map<String, BEValue> info = new TreeMap<String, BEValue>();
-
-		try {
-			info.put("name", new BEValue(parent.getName()));
-			info.put("piece length", new BEValue(this.pieceLength));
-
-			if (this.files == null || this.files.isEmpty()) {
-				info.put("length", new BEValue(parent.length()));
-				info.put("pieces", new BEValue(Torrent.hashFile(parent),
-						Torrent.BYTE_ENCODING));
-				return info;
-			} 
-			else {
-				List<BEValue> fileInfo = new LinkedList<BEValue>();
-				for (File file : files) {
-					Map<String, BEValue> fileMap = new HashMap<String, BEValue>();
-					fileMap.put("length", new BEValue(file.length()));
-
-					LinkedList<BEValue> filePath = new LinkedList<BEValue>();
-					while (file != null) {
-						if (file.equals(parent)) {
-							break;
-						}
-
-						filePath.addFirst(new BEValue(file.getName()));
-						file = file.getParentFile();
-					}
-
-					fileMap.put("path", new BEValue(filePath));
-					fileInfo.add(new BEValue(fileMap));
-				}
-				info.put("files", new BEValue(fileInfo));
-				info.put("pieces", new BEValue(Torrent.hashFiles(this.files),
-						Torrent.BYTE_ENCODING));
-
-				return info;
-			}	
-		} catch (InterruptedException | IOException e) {
-			e.printStackTrace();
-		}
-
-		return null;
-	}
-
-	/**
-	 * Function to create a list of URLs for the alternate trackers.
-	 * @return a list of BEValues with the listing of the URLs of alternate trackers for the torrent.
-	 * @throws UnsupportedEncodingException
-	 *
-	 **/
-	public List<BEValue> createAnnounceList() throws UnsupportedEncodingException{
-		List<BEValue> tiers = new LinkedList<BEValue>();
-		for (List<URI> trackers : this.announceList ) {
-			List<BEValue> tierInfo = new LinkedList<BEValue>();
-			for (URI trackerURI : trackers) {
-				tierInfo.add(new BEValue(trackerURI.toString()));
-			}
-			tiers.add(new BEValue(tierInfo));
-		}
-
-		return tiers;
-	}
-
 	// -------------------------------------------------------------------------
 	// Getter - Setters.
 	// -------------------------------------------------------------------------
@@ -216,11 +149,11 @@ public class RTTorrent{
 		this.parent = new File(parent);
 	}
 
-	public List<File> getFiles() {
+	public List<TorrentFile> getFiles() {
 		return files;
 	}
 
-	public void setFiles(List<File> files) {
+	public void setFiles(List<TorrentFile> files) {
 		this.files = files;
 	}
 
