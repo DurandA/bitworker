@@ -26,6 +26,9 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -72,19 +75,16 @@ import com.turn.ttorrent.bcodec.BEncoder;
  */
 public class Torrent {
 
-	private static final Logger logger =
-		LoggerFactory.getLogger(Torrent.class);
+	private static final Logger logger = LoggerFactory.getLogger(Torrent.class);
 
 	/** Torrent file piece length (in bytes), we use 512 kB. */
 	private static final int PIECE_LENGTH = 512 * 1024;
-
 	public static final int PIECE_HASH_SIZE = 20;
 
 	/** The query parameters encoding when parsing byte strings. */
 	public static final String BYTE_ENCODING = "ISO-8859-1";
 
 	/**
-	 *
 	 * @author dgiffin
 	 * @author mpetazzoni
 	 */
@@ -122,6 +122,7 @@ public class Torrent {
 	private int chainLength;
 	private int plaintextLenMin;
 	private int plaintextLenMax;
+	private long pieceLength;
 	private String charset;
 	private String hashAlgorithm;
 
@@ -291,15 +292,16 @@ public class Torrent {
 			String.format("%,d", this.size));
 	}
 	
+
 	// ----------------------------------------------------------------------------------------------
-	// RT Torrent .
+	// Start of modification : RT Torrent .
 	// ----------------------------------------------------------------------------------------------
 	
-	public Torrent(byte[] torrent, boolean seeder, RTTorrent info) throws IOException {
-		this.encoded = torrent;
+	public Torrent(RTTorrent info, boolean seeder, String torrentPath) throws IOException {
+		// Variables.
+		this.encoded = Files.readAllBytes(Paths.get(torrentPath));
 		this.seeder = seeder;
-		this.decoded = BDecoder.bdecode(
-				new ByteArrayInputStream(this.encoded)).getMap();
+		this.decoded = BDecoder.bdecode(new ByteArrayInputStream(this.encoded)).getMap();
 
 		// Get information.
 		this.decoded_info = this.decoded.get("info").getMap();
@@ -309,11 +311,7 @@ public class Torrent {
 		this.info_hash = Torrent.hash(this.encoded_info);
 		this.hex_info_hash = Torrent.byteArrayToHexString(this.info_hash);
 
-		/**
-		 * Parses the announce information from the decoded meta-info
-		 * structure.
-
-		 */
+		//Parses the announce information from the decoded meta-info structure.
 		try {
 			this.trackers = new ArrayList<List<URI>>();
 			this.allTrackers = new HashSet<URI>();
@@ -325,8 +323,11 @@ public class Torrent {
 		} catch (URISyntaxException use) {
 			throw new IOException(use);
 		}
+		
+		// -------------------------------------------------------------------------------------------
+		// Decoding informations.
+		// -------------------------------------------------------------------------------------------
 
-		// Decode simple entries.
 		this.creationDate = this.decoded.containsKey("creation date")
 			? new Date(this.decoded.get("creation date").getLong() * 1000)
 			: null;
@@ -359,24 +360,31 @@ public class Torrent {
 					? this.decoded.get("hash algorithm").getString()
 					: null;
 			
+		this.pieceLength = this.decoded.containsKey("hash algorithm")
+				? this.decoded_info.get("piece length").getInt()
+				:0;
 			
 		this.name = this.decoded_info.get("name").getString();
 		this.files = new LinkedList<TorrentFile>();
 		
+		// -------------------------------------------------------------------------------------------
 		// Parse multi-file torrent file information structure.
+		// -------------------------------------------------------------------------------------------
+		
 		if (this.decoded_info.containsKey("files")) {
 			for (BEValue file : this.decoded_info.get("files").getList()) {
 				Map<String, BEValue> fileInfo = file.getMap();
-				StringBuilder path = new StringBuilder();
+				StringBuilder localPath = new StringBuilder();
 				for (BEValue pathElement : fileInfo.get("path").getList()) {
-					path.append(File.separator)
+					localPath.append(File.separator)
 						.append(pathElement.getString());
 				}
 				this.files.add(new TorrentFile(
-					new File(this.name, path.toString()),
+					new File(this.name, localPath.toString()),
 					fileInfo.get("length").getLong()));
 			}
-		} else {
+		} 
+		else {
 			// For single-file torrents, the name of the torrent is
 			// directly the name of the file.
 			this.files.add(new TorrentFile(
@@ -384,8 +392,12 @@ public class Torrent {
 				this.decoded_info.get("length").getLong()));
 		}
 
+		// -------------------------------------------------------------------------------------------
 		// Calculate the total size of this torrent from its files' sizes.
+		// -------------------------------------------------------------------------------------------
+		
 		long size = 0;
+		
 		for (TorrentFile file : this.files) {
 			size += file.size;
 		}
@@ -414,7 +426,10 @@ public class Torrent {
 			}
 		}
 		
-		// Store information.
+		// -------------------------------------------------------------------------------------------
+		// Store information into our RTTorrent file.
+		// -------------------------------------------------------------------------------------------
+
 		info.setParent(this.name);
 		info.setCreationDate(this.creationDate);
 		info.setChainLen(this.chainLength);
@@ -424,13 +439,14 @@ public class Torrent {
 		info.setHashAlgorithm(this.hashAlgorithm);
 		if (this.comment != null) {info.setComment(this.comment);}
 		if (this.createdBy != null) {info.setCreatedBy(this.createdBy);}
-		info.setPieceLength((this.size / this.decoded_info.get("piece length").getInt()));
 		info.setLength(this.size);
+		info.setPieceLength(pieceLength);
+		info.setLength(size);
 	}
 	
-	// ----------------------------------------------------------------------------------------------
+	// ------------------------------------------------------------------------------------------------
 	// End of modification.
-	// ----------------------------------------------------------------------------------------------
+	// ------------------------------------------------------------------------------------------------
 
 	/**
 	 * Get this torrent's name.

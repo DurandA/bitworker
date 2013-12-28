@@ -144,7 +144,6 @@ public class RTTorrent{
 		Map<String, BEValue> info = new TreeMap<String, BEValue>();
 
 		try {
-
 			info.put("name", new BEValue(parent.getName()));
 			info.put("piece length", new BEValue(this.pieceLength));
 
