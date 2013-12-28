@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -22,46 +23,52 @@ import com.turn.ttorrent.bcodec.BEValue;
  * 				  about rainbow tables.
  *
  */
-public class TorrentInfo{
-	
+public class RTTorrent{
+
 	// -------------------------------------------------------------------------
 	// Variables.
 	// -------------------------------------------------------------------------
-	
+
 	/**
 	 * Torrent file parent and path.
 	 */
 	private File parent = null;
-	
+
 	/**
 	 * A list of dictionaries, one dictionary for each file in the torrent, which is described in the next table.
 	 */
 	private List<File> files = null;
-	
+
 	/**
 	 * The length of the file, in bytes. Should be multiple of 16 (bytes). Used to calculate chain_num. Should be 
 	 * a multiple of piece length.
 	 */
 	@SuppressWarnings("unused")
 	private long length = 0;
-	
+
+	/**
+	 * The length of the file, in bytes. Should be multiple of 16 (bytes). Used to calculate chain_num. Should be 
+	 * a multiple of piece length.
+	 */
+	private Date creationDate = null;
+
 	/**
 	 * A list of strings representing the relative path to the file. parent of the rainbow table should match rtgen
 	 * naming scheme. For example, 536,870,912 md5_loweralpha-numeric#1-7_0_3800x33554432_0.rt
 	 */
 	private LinkedList<BEValue> filePath = new LinkedList<BEValue>();
-	
+
 	/**
 	 * The table_index parameter selects the reduction function. Rainbow table with different table_index parameter
 	 * uses different reduction function.
 	 */
 	private int tableIndex = 0;
-	
+
 	/**
 	 * The URL of the tracker for the torrent.
 	 */
 	private URI announce = null;
-	
+
 	/**
 	 * A listing of the URLs of alternate trackers for the torrent. The URLs 
 	 * are divided into groups (each is a list), trackers in each group may 
@@ -69,7 +76,7 @@ public class TorrentInfo{
 	 * Optional.
 	 */
 	private List<List<URI>> announceList = null;
-	
+
 	/**
 	 * Rainbow table is hash algorithm specific. Rainbow table for a certain 
 	 * hash algorithm only helps to crack hashes of that type. The rtgen program 
@@ -77,72 +84,74 @@ public class TorrentInfo{
 	 * halflmchall, ntlmchall, oracle.
 	 */
 	private String hashAlgorithm = null;
-	
+
 	/**
 	 * The charset includes all possible characters for the plaintext. 
 	 * "loweralpha-numeric" stands for "abcdefghijklmnopqrstuvwxyz0123456789", 
 	 * which is defined in configuration file charset.txt
 	 */
 	private String charset = null;
-	
+
 	/**
 	 * These two parameters limit the plaintext length range of the rainbow table.
 	 */
 	private int plaintextLenMin = 0;
-	
+
 	/**
 	 * These two parameters limit the plaintext length range of the rainbow table.
 	 */
 	private int plaintextLenMax = 0;
-	
+
 	/**
 	 * This is the rainbow chain length. Longer rainbow chain stores more plaintexts 
 	 * and requires longer time to generate.
 	 */
 	private int chainLen = 0;
-	
+
 	/**
 	 * Any user comment for the torrent. Optional.
 	 */
 	private String comment = null;
-	
+
 	/**
 	 * Application-generated string that may include its parent, version, etc. Optional.
 	 */
 	private String createdBy = null;
-	
+
 	/**
 	 * Piece length in kB.
 	 */
-	private int pieceLength = 0; 
-	
+	private long pieceLength = 0; 
+
 	// -------------------------------------------------------------------------
 	// Constructor.
 	// -------------------------------------------------------------------------
-	
+
 	/**
-	 * Default constructor.
+	 * Default constructors.
 	 */
-	public TorrentInfo(String Parent){
+	public RTTorrent(){}
+
+	public RTTorrent(String Parent){
 		setParent(Parent);
 	}
-	
+
 	/**
 	 * Function to compile together the fields required for the info tag.
 	 * @return a map with file information for the torrent.
 	 */
 	public Map<String, BEValue> createInfo(){
 		Map<String, BEValue> info = new TreeMap<String, BEValue>();
-		
+
 		try {
-			
+
 			info.put("name", new BEValue(parent.getName()));
 			info.put("piece length", new BEValue(this.pieceLength));
 
 			if (this.files == null || this.files.isEmpty()) {
 				info.put("length", new BEValue(parent.length()));
 				info.put("pieces", new BEValue(Torrent.hashFile(parent),
-					Torrent.BYTE_ENCODING));
+						Torrent.BYTE_ENCODING));
 				return info;
 			} 
 			else {
@@ -166,33 +175,33 @@ public class TorrentInfo{
 				}
 				info.put("files", new BEValue(fileInfo));
 				info.put("pieces", new BEValue(Torrent.hashFiles(this.files),
-					Torrent.BYTE_ENCODING));
-				
+						Torrent.BYTE_ENCODING));
+
 				return info;
 			}	
 		} catch (InterruptedException | IOException e) {
 			e.printStackTrace();
 		}
-		
+
 		return null;
 	}
-	
+
 	/**
 	 * Function to create a list of URLs for the alternate trackers.
 	 * @return a list of BEValues with the listing of the URLs of alternate trackers for the torrent.
 	 * @throws UnsupportedEncodingException
 	 *
-	**/
+	 **/
 	public List<BEValue> createAnnounceList() throws UnsupportedEncodingException{
 		List<BEValue> tiers = new LinkedList<BEValue>();
-			for (List<URI> trackers : this.announceList ) {
-				List<BEValue> tierInfo = new LinkedList<BEValue>();
-				for (URI trackerURI : trackers) {
-					tierInfo.add(new BEValue(trackerURI.toString()));
-				}
-				tiers.add(new BEValue(tierInfo));
+		for (List<URI> trackers : this.announceList ) {
+			List<BEValue> tierInfo = new LinkedList<BEValue>();
+			for (URI trackerURI : trackers) {
+				tierInfo.add(new BEValue(trackerURI.toString()));
 			}
-		
+			tiers.add(new BEValue(tierInfo));
+		}
+
 		return tiers;
 	}
 
@@ -231,7 +240,7 @@ public class TorrentInfo{
 	public int getTableIndex() {
 		return tableIndex;
 	}
-	
+
 	public void setTableIndex(int tableIndex) {
 		this.tableIndex = tableIndex;
 	}
@@ -308,11 +317,23 @@ public class TorrentInfo{
 		this.createdBy = createdBy;
 	}
 
-	public int getPieceLength() {
+	public long getPieceLength() {
 		return pieceLength;
 	}
 
-	public void setPieceLength(int piece_length) {
+	public void setPieceLength(long piece_length) {
 		this.pieceLength = piece_length * 1024;
 	};
+
+	public Date getCreationDate() {
+		return creationDate;
+	}
+
+	public void setCreationDate(Date creationDate) {
+		this.creationDate = creationDate;
+	}
+
+	public void setLength(long length) {
+		this.length = length;
+	}
 }

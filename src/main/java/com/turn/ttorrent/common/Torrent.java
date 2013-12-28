@@ -116,8 +116,16 @@ public class Torrent {
 	private final String name;
 	private final long size;
 	protected final List<TorrentFile> files;
-
 	private final boolean seeder;
+	
+	// RTTorrent specific
+	private int chainLength;
+	private int plaintextLenMin;
+	private int plaintextLenMax;
+	private String charset;
+	private String hashAlgorithm;
+
+
 
 	/**
 	 * Create a new torrent from meta-info binary data.
@@ -282,6 +290,147 @@ public class Torrent {
 		logger.info("  Total size..: {} byte(s)",
 			String.format("%,d", this.size));
 	}
+	
+	// ----------------------------------------------------------------------------------------------
+	// RT Torrent .
+	// ----------------------------------------------------------------------------------------------
+	
+	public Torrent(byte[] torrent, boolean seeder, RTTorrent info) throws IOException {
+		this.encoded = torrent;
+		this.seeder = seeder;
+		this.decoded = BDecoder.bdecode(
+				new ByteArrayInputStream(this.encoded)).getMap();
+
+		// Get information.
+		this.decoded_info = this.decoded.get("info").getMap();
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		BEncoder.bencode(this.decoded_info, baos);
+		this.encoded_info = baos.toByteArray();
+		this.info_hash = Torrent.hash(this.encoded_info);
+		this.hex_info_hash = Torrent.byteArrayToHexString(this.info_hash);
+
+		/**
+		 * Parses the announce information from the decoded meta-info
+		 * structure.
+
+		 */
+		try {
+			this.trackers = new ArrayList<List<URI>>();
+			this.allTrackers = new HashSet<URI>();
+
+			if(this.decoded.containsKey("announce")) {
+				info.setAnnounce(new URI(this.decoded.get("announce").getString()));
+			}
+			
+		} catch (URISyntaxException use) {
+			throw new IOException(use);
+		}
+
+		// Decode simple entries.
+		this.creationDate = this.decoded.containsKey("creation date")
+			? new Date(this.decoded.get("creation date").getLong() * 1000)
+			: null;
+			
+		this.comment = this.decoded.containsKey("comment")
+			? this.decoded.get("comment").getString()
+			: null;
+			
+		this.createdBy = this.decoded.containsKey("created by")
+			? this.decoded.get("created by").getString()
+			: null;
+			
+		this.chainLength = this.decoded.containsKey("chain len")
+			? this.decoded.get("chain len").getInt()
+			: 0;
+			
+		this.plaintextLenMin = this.decoded.containsKey("plaintext min")
+			? this.decoded.get("plaintext min").getInt()
+			: 0;
+			
+		this.plaintextLenMax = this.decoded.containsKey("plaintext max")
+			? this.decoded.get("plaintext max").getInt()
+			: 0;
+			
+		this.charset = this.decoded.containsKey("charset")
+			? this.decoded.get("charset").getString()
+			: null;
+			
+		this.hashAlgorithm = this.decoded.containsKey("hash algorithm")
+					? this.decoded.get("hash algorithm").getString()
+					: null;
+			
+			
+		this.name = this.decoded_info.get("name").getString();
+		this.files = new LinkedList<TorrentFile>();
+		
+		// Parse multi-file torrent file information structure.
+		if (this.decoded_info.containsKey("files")) {
+			for (BEValue file : this.decoded_info.get("files").getList()) {
+				Map<String, BEValue> fileInfo = file.getMap();
+				StringBuilder path = new StringBuilder();
+				for (BEValue pathElement : fileInfo.get("path").getList()) {
+					path.append(File.separator)
+						.append(pathElement.getString());
+				}
+				this.files.add(new TorrentFile(
+					new File(this.name, path.toString()),
+					fileInfo.get("length").getLong()));
+			}
+		} else {
+			// For single-file torrents, the name of the torrent is
+			// directly the name of the file.
+			this.files.add(new TorrentFile(
+				new File(this.name),
+				this.decoded_info.get("length").getLong()));
+		}
+
+		// Calculate the total size of this torrent from its files' sizes.
+		long size = 0;
+		for (TorrentFile file : this.files) {
+			size += file.size;
+		}
+		this.size = size;
+
+		logger.info("  Announced at:" + (this.trackers.size() == 0 ? " Seems to be trackerless" : ""));
+		for (int i=0; i < this.trackers.size(); i++) {
+			List<URI> tier = this.trackers.get(i);
+			for (int j=0; j < tier.size(); j++) {
+				logger.info("    {}{}",
+					(j == 0 ? String.format("%2d. ", i+1) : "    "),
+					tier.get(j));
+			}
+		}
+
+		// Get MultiFile if existing.
+		if (this.isMultifile()) {
+			int i = 0;
+			for (TorrentFile file : this.files) {
+				logger.debug("    {}. {} ({} byte(s))",
+					new Object[] {
+						String.format("%2d", ++i),
+						file.file.getPath(),
+						String.format("%,d", file.size)
+					});
+			}
+		}
+		
+		// Store information.
+		info.setParent(this.name);
+		info.setCreationDate(this.creationDate);
+		info.setChainLen(this.chainLength);
+		info.setPlaintextLenMin(this.plaintextLenMin);
+		info.setPlaintextLenMax(this.plaintextLenMax);
+		info.setCharset(this.charset);
+		info.setHashAlgorithm(this.hashAlgorithm);
+		if (this.comment != null) {info.setComment(this.comment);}
+		if (this.createdBy != null) {info.setCreatedBy(this.createdBy);}
+		info.setPieceLength((this.size / this.decoded_info.get("piece length").getInt()));
+		info.setLength(this.size);
+	}
+	
+	// ----------------------------------------------------------------------------------------------
+	// End of modification.
+	// ----------------------------------------------------------------------------------------------
 
 	/**
 	 * Get this torrent's name.
@@ -666,6 +815,9 @@ public class Torrent {
 		return new Torrent(baos.toByteArray(), true);
 	}
 	
+	// ----------------------------------------------------------------------------------------------
+	// Start of modification.
+	// ----------------------------------------------------------------------------------------------
 	
 	/**
 	 * @author Thomas Rouvinez
@@ -674,7 +826,7 @@ public class Torrent {
 	 * @param description
 	 * @return an encoded torrent.
 	 */
-	public static Torrent create(TorrentInfo description)
+	public static Torrent create(RTTorrent description)
 	{
 		Map<String, BEValue> torrent = new HashMap<String, BEValue>();
 
@@ -693,12 +845,12 @@ public class Torrent {
 			// Set the rest of the fields.
 			torrent.put("hash algorithm", new BEValue(description.getHashAlgorithm()));
 			torrent.put("charset", new BEValue(description.getCharset()));
-			torrent.put("plaintext min", new BEValue(String.valueOf(description.getPlaintextLenMin())));
-			torrent.put("plaintext max", new BEValue(String.valueOf(description.getPlaintextLenMax())));
-			torrent.put("chain len", new BEValue(String.valueOf(description.getChainLen())));
+			torrent.put("plaintext min", new BEValue(description.getPlaintextLenMin()));
+			torrent.put("plaintext max", new BEValue(description.getPlaintextLenMax()));
+			torrent.put("chain len", new BEValue(description.getChainLen()));
 			torrent.put("creation date", new BEValue(new Date().getTime() / 1000));
 			if(description.getComment() != null) {torrent.put("comment", new BEValue(description.getComment()));}
-			torrent.put("created by", new BEValue(description.getCreatedBy()));
+			if(description.getCreatedBy() != null) {torrent.put("created by", new BEValue(description.getCreatedBy()));}
 			
 			// Return the encoded torrent file.
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -711,6 +863,10 @@ public class Torrent {
 			return null;
 		}
 	}
+	
+	// ----------------------------------------------------------------------------------------------
+	// End of modification.
+	// ----------------------------------------------------------------------------------------------
 	
 
 	/**
