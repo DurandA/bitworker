@@ -26,9 +26,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -125,8 +122,7 @@ public class Torrent {
 	private long pieceLength;
 	private String charset;
 	private String hashAlgorithm;
-
-
+	private URI announce;
 
 	/**
 	 * Create a new torrent from meta-info binary data.
@@ -139,6 +135,7 @@ public class Torrent {
 	 * @throws IOException When the info dictionary can't be read or
 	 * encoded and hashed back to create the torrent's SHA-1 hash.
 	 */
+	/*
 	public Torrent(byte[] torrent, boolean seeder) throws IOException {
 		this.encoded = torrent;
 		this.seeder = seeder;
@@ -166,7 +163,7 @@ public class Torrent {
 		 *
 		 * @see <a href="http://bittorrent.org/beps/bep_0012.html">BitTorrent BEP#0012 "Multitracker Metadata Extension"</a>
 		 */
-		try {
+		/*try {
 			this.trackers = new ArrayList<List<URI>>();
 			this.allTrackers = new HashSet<URI>();
 
@@ -290,16 +287,16 @@ public class Torrent {
 			this.decoded_info.get("piece length").getInt());
 		logger.info("  Total size..: {} byte(s)",
 			String.format("%,d", this.size));
-	}
+	}*/
 	
 
 	// ----------------------------------------------------------------------------------------------
 	// Start of modification : RT Torrent .
 	// ----------------------------------------------------------------------------------------------
 	
-	public Torrent(RTTorrent info, boolean seeder, String torrentPath) throws IOException {
+	public Torrent(byte[] torrent, boolean seeder) throws IOException {
 		// Variables.
-		this.encoded = Files.readAllBytes(Paths.get(torrentPath));
+		this.encoded = torrent;
 		this.seeder = seeder;
 		this.decoded = BDecoder.bdecode(new ByteArrayInputStream(this.encoded)).getMap();
 
@@ -317,7 +314,7 @@ public class Torrent {
 			this.allTrackers = new HashSet<URI>();
 
 			if(this.decoded.containsKey("announce")) {
-				info.setAnnounce(new URI(this.decoded.get("announce").getString()));
+				this.announce = (new URI(this.decoded.get("announce").getString()));
 			}
 			
 		} catch (URISyntaxException use) {
@@ -396,25 +393,7 @@ public class Torrent {
 			size += file.size;
 		}
 		
-		this.size = size;
-		
-		// -------------------------------------------------------------------------------------------
-		// Store information into our RTTorrent file.
-		// -------------------------------------------------------------------------------------------
-
-		info.setParent(this.name);
-		info.setCreationDate(this.creationDate);
-		info.setChainLen(this.chainLength);
-		info.setPlaintextLenMin(this.plaintextLenMin);
-		info.setPlaintextLenMax(this.plaintextLenMax);
-		info.setCharset(this.charset);
-		info.setHashAlgorithm(this.hashAlgorithm);
-		if (this.comment != null) {info.setComment(this.comment);}
-		if (this.createdBy != null) {info.setCreatedBy(this.createdBy);}
-		info.setLength(this.size);
-		info.setPieceLength(pieceLength);
-		info.setLength(size);
-		info.setFiles(this.files);
+		this.size = size;	
 	}
 	
 	// ------------------------------------------------------------------------------------------------
@@ -951,5 +930,69 @@ public class Torrent {
 		} catch (ExecutionException ee) {
 			throw new IOException("Error while hashing the torrent data!", ee);
 		}
+	}
+
+	// ------------------------------------------------------------------------------
+	// Getters && Setters for RT Torrents' specific information.
+	// ------------------------------------------------------------------------------
+
+	public int getChainLength() {
+		return chainLength;
+	}
+
+	public void setChainLength(int chainLength) {
+		this.chainLength = chainLength;
+	}
+
+	public int getPlaintextLenMin() {
+		return plaintextLenMin;
+	}
+
+	public void setPlaintextLenMin(int plaintextLenMin) {
+		this.plaintextLenMin = plaintextLenMin;
+	}
+
+	public int getPlaintextLenMax() {
+		return plaintextLenMax;
+	}
+
+	public void setPlaintextLenMax(int plaintextLenMax) {
+		this.plaintextLenMax = plaintextLenMax;
+	}
+
+	public long getPieceLength() {
+		return pieceLength;
+	}
+
+	public void setPieceLength(long pieceLength) {
+		this.pieceLength = pieceLength;
+	}
+
+	public String getCharset() {
+		return charset;
+	}
+
+	public void setCharset(String charset) {
+		this.charset = charset;
+	}
+
+	public String getHashAlgorithm() {
+		return hashAlgorithm;
+	}
+
+	public void setHashAlgorithm(String hashAlgorithm) {
+		this.hashAlgorithm = hashAlgorithm;
+	}
+
+	public URI getAnnounce() {
+		return announce;
+	}
+
+	public void setAnnounce(URI announce) {
+		this.announce = announce;
+	}
+
+	public Date getCreationDate() {
+		return creationDate;
 	}
 }
