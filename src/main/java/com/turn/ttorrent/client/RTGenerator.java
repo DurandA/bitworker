@@ -55,15 +55,18 @@ public class RTGenerator implements Runnable {
 		        indices[i] =j++;
 		    }
 		    
+		    
 			int pieceIndex=indices[rand.nextInt(indices.length)];
 			
-
+			
+			
 			/*
 			 * The table_index parameter selects the reduction function.
 			 * Rainbow table with different table_index parameter uses
 			 * different reduction function.
 			 */
 			int table_index = 0;		
+			
 			
 			int part_index = 1;
 			

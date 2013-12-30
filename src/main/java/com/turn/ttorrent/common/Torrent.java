@@ -89,10 +89,20 @@ public class Torrent {
 
 		public final File file;
 		public final long size;
+		public final int tableIndex;
 
-		public TorrentFile(File file, long size) {
+		/*public TorrentFile(File file, long size) {
 			this.file = file;
 			this.size = size;
+		}*/
+		
+		/**
+		 * @author Arnaud Durand
+		 */
+		public TorrentFile(File file, long size, int tableIndex) {
+			this.file = file;
+			this.size = size;
+			this.tableIndex = tableIndex;
 		}
 	}
 
