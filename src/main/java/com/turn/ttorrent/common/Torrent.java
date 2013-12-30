@@ -106,7 +106,6 @@ public class Torrent {
 		}
 	}
 
-
 	protected final byte[] encoded;
 	protected final byte[] encoded_info;
 	protected final Map<String, BEValue> decoded;
@@ -389,7 +388,7 @@ public class Torrent {
 				
 				this.files.add(new TorrentFile(
 					new File(this.name, localPath.toString()),
-					fileInfo.get("length").getLong()));
+					fileInfo.get("length").getLong(), fileInfo.get("table index").getInt()));
 			}
 		}
 
