@@ -65,17 +65,16 @@ public class RTGenerator implements Runnable {
 			 * Rainbow table with different table_index parameter uses
 			 * different reduction function.
 			 */
-			int table_index = 0;		
-			
-			
-			int part_index = 1;
+	
 			
 			// UnavailablePieces is updated because race conditions can
 			// change.
 			unavailablePieces = torrent.getUnavailablePieces();
 		}
-
-		
+			//it choose the reduce function 
+			int table_index = 0;		
+			//the number of the table
+			int part_index = 1;
 		try {
 			Runtime rt = Runtime.getRuntime();
 			// Process pr = rt.exec("cmd /c dir");
