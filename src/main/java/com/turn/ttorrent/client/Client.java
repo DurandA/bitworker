@@ -71,7 +71,7 @@ import org.slf4j.LoggerFactory;
  * @author mpetazzoni
  */
 public class Client extends Observable implements Runnable,
-	AnnounceResponseListener, IncomingConnectionListener, PeerActivityListener {
+	AnnounceResponseListener, IncomingConnectionListener, PeerActivityListener, RTGenerationListener {
 
 	private static final Logger logger =
 		LoggerFactory.getLogger(Client.class);

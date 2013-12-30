@@ -493,6 +493,35 @@ public class SharedTorrent extends Torrent implements PeerActivityListener {
 
 		return availablePieces;
 	}
+	
+	/**
+	 * Return a copy of the bit field of unavailable pieces for this torrent.
+	 *
+	 * <p>
+	 * Unavailable pieces are pieces unavailable in the swarm, and it does not
+	 * include our own pieces.
+	 * </p>
+	 * 
+	 * @author Arnaud Durand
+	 */
+	public BitSet getUnavailablePieces() {
+		if (!this.isInitialized()) {
+			throw new IllegalStateException("Torrent not yet initialized!");
+		}
+
+		BitSet availablePieces = new BitSet(this.pieces.length);
+
+		synchronized (this.pieces) {
+			for (Piece piece : this.pieces) {
+				if (!piece.available()) {
+					availablePieces.set(piece.getIndex());
+				}
+			}
+		}
+
+		availablePieces.andNot(completedPieces);
+		return availablePieces;
+	}
 
 	/**
 	 * Return a copy of the completed pieces bitset.
