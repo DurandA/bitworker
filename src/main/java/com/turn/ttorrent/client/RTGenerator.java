@@ -60,7 +60,7 @@ public class RTGenerator implements Runnable, RTGenerationListener {
 		chainNum = torrent.getPieceLength() / 16;
 
 		BitSet unavailablePieces = torrent.getUnavailablePieces();
-
+		
 		while (!unavailablePieces.isEmpty()) {
 			// Choose a random unavailable piece for generation.
 			int n = unavailablePieces.cardinality();
