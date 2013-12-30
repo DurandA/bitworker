@@ -10,6 +10,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 
+import com.turn.ttorrent.client.peer.PeerActivityListener;
 import com.turn.ttorrent.common.RTTorrentFileDescriptor;
 
 /**
@@ -17,7 +18,7 @@ import com.turn.ttorrent.common.RTTorrentFileDescriptor;
  * @author Mikael Gasparian
  * 
  */
-public class RTGenerator implements Runnable, RTGenerationListener {
+public class RTGenerator implements Runnable {
 
 	public static final String rtgenPath = "C:\\Users\\mg\\Desktop\\rainbowcrack-1.5-win64\\";
 	private static Random rand = new Random();
@@ -123,7 +124,28 @@ public class RTGenerator implements Runnable, RTGenerationListener {
 				e.printStackTrace();
 				break;
 			}
+			
+			Piece p = torrent.getPiece(pieceIndex);
+			
+			// TODO write file content to ByteBuffer
+			try {
+				p.record(null/*file content*/, 0);
+			} catch (IOException e) {
+				e.printStackTrace();
+				break;
+			}
 
+			// If the block offset equals the piece size and the block
+			// length is 0, it means the piece has been entirely
+			// downloaded. In this case, we have nothing to save, but
+			// we should validate the piece.
+			try {
+				p.validate();
+				this.firePieceCompleted(p);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			
 			// UnavailablePieces should be updated because race conditions can
 			// change.
 			unavailablePieces = torrent.getUnavailablePieces();
@@ -138,6 +160,24 @@ public class RTGenerator implements Runnable, RTGenerationListener {
 	 */
 	public void register(RTGenerationListener listener) {
 		this.listeners.add(listener);
+	}
+	
+	/**
+	 * @author Arnaud Durand
+	 * 
+	 * Fire the piece completion event to all registered listeners.
+	 *
+	 * <p>
+	 * The event contains the piece number that was
+	 * completed.
+	 * </p>
+	 *
+	 * @param piece The completed piece.
+	 */
+	private void firePieceCompleted(Piece piece) throws IOException {
+		for (RTGenerationListener listener : this.listeners) {
+			listener.handlePieceGenerationCompleted(piece);
+		}
 	}
 
 }

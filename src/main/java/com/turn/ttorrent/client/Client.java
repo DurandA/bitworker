@@ -987,5 +987,11 @@ public class Client extends Observable implements Runnable,
 				this.timer.cancel();
 			}
 		}
-	};
+	}
+
+	@Override
+	public void handlePieceGenerationCompleted(Piece piece) throws IOException {
+		handlePieceCompleted(null, piece);
+	}
+	
 }

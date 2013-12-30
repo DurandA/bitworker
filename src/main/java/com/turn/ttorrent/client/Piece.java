@@ -195,6 +195,22 @@ public class Piece implements Comparable<Piece> {
 
 		return this.isValid();
 	}*/
+	
+	/**
+	 * @author Arnaud Durand
+	 * 
+	 * Validates this piece.
+	 *
+	 * @return Returns true if this piece, as stored in the underlying byte
+	 * storage, is valid, i.e. its SHA1 sum matches the one from the torrent
+	 * meta-info.
+	 */
+	public synchronized boolean validate() throws IOException {
+		logger.trace("Validating {}...", this);
+		this.valid = true;
+		
+		return this.isValid();
+	}
 
 	/**
 	 * Internal piece data read function.
