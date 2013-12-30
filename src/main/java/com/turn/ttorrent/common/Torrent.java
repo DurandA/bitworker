@@ -447,6 +447,21 @@ public class Torrent {
 		}
 		return filenames;
 	}
+	
+	/**
+	 * @author Arnaud Durand
+	 * Get the file sized from this torrent.
+	 *
+	 * @return The list of the size of all the files described in
+	 * this torrent.
+	 */
+	public List<Long> getFileSizes() {
+		List<Long> fileSizes = new LinkedList<Long>();
+		for (TorrentFile file : this.files) {
+			fileSizes.add(file.size);
+		}
+		return fileSizes;
+	}
 
 	/**
 	 * Tells whether this torrent is multi-file or not.
