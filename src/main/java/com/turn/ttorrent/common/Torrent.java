@@ -85,7 +85,7 @@ public class Torrent {
 	 * @author dgiffin
 	 * @author mpetazzoni
 	 */
-	public static class TorrentFile {
+	public static class TorrentFile implements RTTorrentFileDescriptor {
 
 		public final File file;
 		public final long size;
@@ -103,6 +103,21 @@ public class Torrent {
 			this.file = file;
 			this.size = size;
 			this.tableIndex = tableIndex;
+		}
+
+		@Override
+		public long getLength() {
+			return this.size;
+		}
+
+		@Override
+		public String getPath() {
+			return this.file.getPath();
+		}
+
+		@Override
+		public int getTableIndex() {
+			return this.tableIndex;
 		}
 	}
 
@@ -459,17 +474,13 @@ public class Torrent {
 	
 	/**
 	 * @author Arnaud Durand
-	 * Get the file sized from this torrent.
+	 * Get the file descriptors from this torrent.
 	 *
-	 * @return The list of the size of all the files described in
+	 * @return The list of the descriptors of all the files described in
 	 * this torrent.
 	 */
-	public List<Long> getFileSizes() {
-		List<Long> fileSizes = new LinkedList<Long>();
-		for (TorrentFile file : this.files) {
-			fileSizes.add(file.size);
-		}
-		return fileSizes;
+	public List<? extends RTTorrentFileDescriptor> getFileDescriptors() {
+		return files;
 	}
 
 	/**
