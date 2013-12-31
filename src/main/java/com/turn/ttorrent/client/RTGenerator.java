@@ -10,12 +10,10 @@ import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 
-import com.turn.ttorrent.client.peer.PeerActivityListener;
 import com.turn.ttorrent.common.RTTorrentFileDescriptor;
 
 /**
  * @author Arnaud Durand
- * @author Mikael Gasparian
  * 
  */
 public class RTGenerator implements Runnable {
@@ -39,17 +37,85 @@ public class RTGenerator implements Runnable {
 	long chainNum;
 
 	private SharedTorrent torrent;
-	
+
 	private Set<RTGenerationListener> listeners;
 	private ExecutorService executor;
 	private Thread thread;
-	
+
 	public RTGenerator(SharedTorrent torrent) {
 		this.torrent = torrent;
-		
+
 		this.listeners = new HashSet<RTGenerationListener>();
-		this.executor = null;
 		this.thread = null;
+
+	}
+
+	public void start() {
+		if (this.thread == null || !this.thread.isAlive()) {
+			this.thread = new Thread(this);
+			this.thread.setName("rt-generator");
+			this.thread.start();
+		}
+	}
+
+	/**
+	 * @author Arnaud Durand
+	 * @author Mikael Gasparian
+	 * 
+	 */
+	public Piece generatePiece(int pieceIndex) throws InterruptedException,
+			IOException, Exception {
+		RTTorrentFileDescriptor descriptor = null;
+
+		long offset = 0L;
+		List<? extends RTTorrentFileDescriptor> descriptors = torrent
+				.getFileDescriptors();
+
+		for (RTTorrentFileDescriptor d : descriptors) {
+			if (pieceIndex * torrent.getPieceLength() <= offset) {
+				descriptor = d;
+				break;
+			}
+			offset += d.getLength();
+		}
+
+		/*
+		 * The table_index parameter selects the reduction function. Rainbow
+		 * table with different table_index parameter uses different reduction
+		 * function.
+		 */
+		int tableIndex = descriptor.getTableIndex();
+
+		/*
+		 * To store a large rainbow table in many smaller files, use different
+		 * number in this parameter for each part and keep all other parameters
+		 * identical.
+		 */
+		int partIndex = (int) (pieceIndex % offset);
+
+		Runtime rt = Runtime.getRuntime();
+		Process pr;
+
+		pr = rt.exec(new String[] { rtgenPath + "rtgen.exe", hashAlgorithm,
+				charset, Integer.toString(plaintextLenMin),
+				Integer.toString(plaintextLenMax),
+				Integer.toString(tableIndex), Integer.toString(chainLength),
+				Long.toString(chainNum), Integer.toString(partIndex) });
+		int exitVal;
+		if ((exitVal = pr.waitFor()) != 0)
+			throw new Exception("rtgen exited with error code " + exitVal);
+		pr = rt.exec(new String[] { rtgenPath + "rtsort.exe",
+				descriptor.getPath() });
+		if ((exitVal = pr.waitFor()) != 0)
+			throw new Exception("rtsort exited with error code " + exitVal);
+
+		Piece p = torrent.getPiece(pieceIndex);
+
+		// TODO write file content to ByteBuffer
+
+		p.record(null/* file content */, 0);
+
+		return p;
 	}
 
 	public void run() {
@@ -61,7 +127,7 @@ public class RTGenerator implements Runnable {
 		chainNum = torrent.getPieceLength() / 16;
 
 		BitSet unavailablePieces = torrent.getUnavailablePieces();
-		
+
 		while (!unavailablePieces.isEmpty()) {
 			// Choose a random unavailable piece for generation.
 			int n = unavailablePieces.cardinality();
@@ -74,105 +140,52 @@ public class RTGenerator implements Runnable {
 			// Pick random unavailable piece.
 			int pieceIndex = indices[rand.nextInt(indices.length)];
 
-			RTTorrentFileDescriptor descriptor = null;
-
-			long offset = 0L;
-			List<? extends RTTorrentFileDescriptor> descriptors = torrent
-					.getFileDescriptors();
-
-			for (RTTorrentFileDescriptor d : descriptors) {
-				if (pieceIndex * torrent.getPieceLength() <= offset) {
-					descriptor = d;
-					break;
-				}
-				offset += d.getLength();
-			}
-
-			/*
-			 * The table_index parameter selects the reduction function. Rainbow
-			 * table with different table_index parameter uses different
-			 * reduction function.
-			 */
-			int tableIndex = descriptor.getTableIndex();
-
-			/*
-			 * To store a large rainbow table in many smaller files, use
-			 * different number in this parameter for each part and keep all
-			 * other parameters identical.
-			 */
-			int partIndex = (int) (pieceIndex % offset);
-
-			Runtime rt = Runtime.getRuntime();
-			Process pr;
+			Piece p;
+			
 			try {
-				pr = rt.exec(new String[] { rtgenPath + "rtgen.exe",
-						hashAlgorithm, charset, Integer.toString(plaintextLenMin),
-						Integer.toString(plaintextLenMax),
-						Integer.toString(tableIndex),
-						Integer.toString(chainLength), Long.toString(chainNum),
-						Integer.toString(partIndex) });
-				int exitVal;
-				if ((exitVal=pr.waitFor())!=0)
-					throw new Exception("rtgen exited with error code " + exitVal);
-				pr = rt.exec(new String[]{rtgenPath + "rtsort.exe",descriptor.getPath()});
-				if ((exitVal=pr.waitFor())!=0)
-					throw new Exception("rtsort exited with error code " + exitVal);
-			} catch (IOException|InterruptedException e) {
+				p=generatePiece(pieceIndex);
+			} catch (IOException | InterruptedException e) {
 				e.printStackTrace();
 				continue;
 			} catch (Exception e) {
 				e.printStackTrace();
 				break;
 			}
-			
-			Piece p = torrent.getPiece(pieceIndex);
-			
-			// TODO write file content to ByteBuffer
-			try {
-				p.record(null/*file content*/, 0);
-			} catch (IOException e) {
-				e.printStackTrace();
-				break;
-			}
 
-			// If the block offset equals the piece size and the block
-			// length is 0, it means the piece has been entirely
-			// downloaded. In this case, we have nothing to save, but
-			// we should validate the piece.
 			try {
 				p.validate();
 				this.firePieceCompleted(p);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			
+
 			// UnavailablePieces should be updated because race conditions can
 			// change.
 			unavailablePieces = torrent.getUnavailablePieces();
 		}
 	}
-	
+
 	/**
 	 * Register a new incoming connection listener.
-	 *
-	 * @param listener The listener who wants to receive connection
-	 * notifications.
+	 * 
+	 * @param listener
+	 *            The listener who wants to receive connection notifications.
 	 */
 	public void register(RTGenerationListener listener) {
 		this.listeners.add(listener);
 	}
-	
+
 	/**
 	 * @author Arnaud Durand
 	 * 
-	 * Fire the piece completion event to all registered listeners.
-	 *
-	 * <p>
-	 * The event contains the piece number that was
-	 * completed.
-	 * </p>
-	 *
-	 * @param piece The completed piece.
+	 *         Fire the piece completion event to all registered listeners.
+	 * 
+	 *         <p>
+	 *         The event contains the piece number that was completed.
+	 *         </p>
+	 * 
+	 * @param piece
+	 *            The completed piece.
 	 */
 	private void firePieceCompleted(Piece piece) throws IOException {
 		for (RTGenerationListener listener : this.listeners) {
