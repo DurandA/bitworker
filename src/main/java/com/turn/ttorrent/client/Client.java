@@ -107,6 +107,7 @@ public class Client extends Observable implements Runnable,
 	private long seed;
 
 	private ConnectionHandler service;
+	private RTGenerator generator;
 	private Announce announce;
 	private ConcurrentMap<String, SharingPeer> peers;
 	private ConcurrentMap<String, SharingPeer> connected;
@@ -114,6 +115,9 @@ public class Client extends Observable implements Runnable,
 	private Random random;
 
 	/**
+	 * @author mpetazzoni
+	 * @author Arnaud Durand
+	 * 
 	 * Initialize the BitTorrent client.
 	 *
 	 * @param address The address to bind to.
@@ -131,6 +135,10 @@ public class Client extends Observable implements Runnable,
 		// it.
 		this.service = new ConnectionHandler(this.torrent, id, address);
 		this.service.register(this);
+		
+		// Initialize the RT generator thread, and register ourselves to it.
+		this.generator = new RTGenerator(this.torrent);
+		this.generator.register(this);
 
 		this.self = new Peer(
 			this.service.getSocketAddress()
