@@ -1,0 +1,6 @@
+
+# profile configuration file for rcrack_gui.exe and rcrack_cuda_gui.exe
+
+[demo profile 1]
+e:\rtc_lm_alpha-numeric#1-7\*.*
+e:\rtc_lm_ascii-32-65-123-4#1-7\*.*
