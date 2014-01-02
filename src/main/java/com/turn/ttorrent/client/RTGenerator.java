@@ -21,7 +21,7 @@ import com.turn.ttorrent.common.RTTorrentFileDescriptor;
  */
 public class RTGenerator implements Runnable {
 
-	public static final String rtgenPath = "C:\\Users\\mg\\Desktop\\rainbowcrack-1.5-win64\\";
+	public static final String rtgenPath = "C:\\rainbowcrack-1.5-win64\\";
 	private static Random rand = new Random();
 
 	private String hashAlgorithm;
