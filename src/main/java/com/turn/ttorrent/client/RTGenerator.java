@@ -115,7 +115,7 @@ public class RTGenerator implements Runnable {
 		Piece p = torrent.getPiece(pieceIndex);
 		String rtFilename=hashAlgorithm+"_"+charset+"#"+plaintextLenMin+"-"+plaintextLenMax+"_"+tableIndex+"_"+chainLength+"x"+chainNum+"_"+partIndex+".rt";
 
-		ByteBuffer generatdFileAsByteBuffer=ByteBuffer.wrap((Files.readAllBytes(Paths.get(rtgenPath+"\\"+rtFilename))));
+		ByteBuffer generatdFileAsByteBuffer=ByteBuffer.wrap((Files.readAllBytes(Paths.get(rtgenPath+rtFilename))));
 		p.record(generatdFileAsByteBuffer, 0);
 
 		return p;
