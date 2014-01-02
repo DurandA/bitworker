@@ -3,6 +3,9 @@ package com.turn.ttorrent.client;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.ByteBuffer;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.BitSet;
 import java.util.HashSet;
 import java.util.List;
@@ -110,10 +113,10 @@ public class RTGenerator implements Runnable {
 			throw new Exception("rtsort exited with error code " + exitVal);
 
 		Piece p = torrent.getPiece(pieceIndex);
+		String rtFilename=hashAlgorithm+"_"+charset+"#"+plaintextLenMin+"-"+plaintextLenMax+"_"+tableIndex+"_"+chainLength+"x"+chainNum+"_"+partIndex+".rt";
 
-		// TODO write file content to ByteBuffer
-
-		p.record(null/* file content */, 0);
+		ByteBuffer generatdFileAsByteBuffer=ByteBuffer.wrap((Files.readAllBytes(Paths.get(rtgenPath+"\\"+rtFilename))));
+		p.record(generatdFileAsByteBuffer, 0);
 
 		return p;
 	}
