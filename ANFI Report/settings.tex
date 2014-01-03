@@ -1,0 +1,110 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\parindent 1cm
+%\parskip 0.2cm
+%\topmargin 0cm
+%\bottommargin 0cm
+%\rightmargin 0cm
+%\leftmargin 0cm
+%\oddsidemargin 1cm
+%\evensidemargin 0.5cm
+%\textwidth 15cm
+%\textheight 21cm
+%\makeindex
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\renewcommand{\familydefault}{\sfdefault}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% where are figures
+\graphicspath{
+  {./}
+  {figures/}
+  }
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%hyperref settings
+\hypersetup{pdfauthor=Thomas Rouvinez, 
+            pdftitle=HL7 Exchange Module, 
+            pdfsubject=YourBookSubjectHere,
+            colorlinks=true,
+            linkcolor=black}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% redefine some colors
+\definecolor{shadethmcolor}{rgb}{0.9412,.9412,1.0000} % 
+\definecolor{shaderulecolor}{rgb}{0.1529,0.2510,0.5451} % RoyalBlue 
+\definecolor{lightergray}{gray}{0.95}
+\definecolor{palegreen}{rgb}{0.7148,0.9219,0.6797} %pale green
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% define the theorem environments
+% 1. definition
+\theoremstyle{break}
+\shadecolor{shadethmcolor}
+\def\theoremframecommand{% 
+\psframebox[fillstyle=solid,fillcolor=shadethmcolor,linecolor=shaderulecolor]} 
+\newshadedtheorem{definition}{Definition}[section]
+% 2. remark
+\theoremstyle{plain} 
+\theoremheaderfont{\normalfont\footnotesize\bfseries} 
+\theorembodyfont{\normalfont\footnotesize} 
+\theoremsymbol{\ensuremath{\clubsuit}} 
+\theoremseparator{.}
+\theoremindent1cm 
+\theoremprework{\smallskip} 
+\theorempostwork{\smallskip} 
+\newtheorem*{remark}{$\rightarrow$ Remark}
+% 3. seobs (software engineering observation)
+\theoremstyle{plain} 
+\theoremheaderfont{\normalfont\bfseries}
+\theorembodyfont{\normalfont\normalsize}  
+\theoremsymbol{\ensuremath{\clubsuit}} 
+\theoremindent0cm 
+\theoremseparator{.} 
+\theoremprework{\bigskip\hrule} 
+\theorempostwork{\hrule\bigskip} 
+\newtheorem{seobs}{Software Engineering Observation}[section]
+% 4. program output
+\theoremstyle{nonumberplain} 
+\theoremindent0.5cm 
+\theorembodyfont{\ttfamily\small}
+\theoremindent0cm 
+\theoremseparator{} 
+\theoremprework{\bigskip\verb}
+\theorempostwork{\bigskip} 
+\shadecolor{shadethmcolor}
+\def\theoremframecommand{% 
+\psframebox[fillstyle=solid,fillcolor=palegreen,linecolor=palegreen]} 
+\newshadedtheorem{programoutput}{}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% settings for the listings
+
+\definecolor{green}{RGB}{0,180,10}
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{
+		language=Java,                % the language of the code
+  		basicstyle=\footnotesize\ttfamily, % Standardschrift
+        numbers=left,               % Ort der Zeilennummern
+        numberstyle=\tiny,          % Stil der Zeilennummern
+        stepnumber=1,               % Abstand zwischen den Zeilennummern
+        numbersep=8pt,              % Abstand der Nummern zum Text
+        tabsize=2,                  % Groesse von Tabs
+        extendedchars=true,         %
+        breaklines=true,            % Zeilen werden Umgebrochen
+        commentstyle=\color{dkgreen},
+        keywordstyle=\color{mauve},
+    	   frame=b,         
+        stringstyle=\color{blue}\ttfamily, % Farbe der String
+        showspaces=false,           % Leerzeichen anzeigen ?
+        showtabs=false,             % Tabs anzeigen ?
+        xleftmargin=17pt,
+        framexleftmargin=17pt,
+        framexrightmargin=5pt,
+        framexbottommargin=4pt,
+        %backgroundcolor=\color{lightgray},
+        showstringspaces=false      % Leerzeichen in Strings anzeigen ?     
+ }
