@@ -84,6 +84,7 @@ public class Torrent {
 	/**
 	 * @author dgiffin
 	 * @author mpetazzoni
+	 * #author Thomas Rouvinez
 	 */
 	public static class TorrentFile implements RTTorrentFileDescriptor {
 
