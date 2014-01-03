@@ -149,6 +149,7 @@ public class Client extends Observable implements Runnable,
 		// Initialize the announce request thread, and register ourselves to it
 		// as well.
 		this.announce = new Announce(this.torrent, this.self);
+		System.out.println(torrent.getAnnounce()+"ANNOUNCE");
 		this.announce.register(this);
 
 		logger.info("BitTorrent client [{}] for {} started and " +
@@ -367,6 +368,7 @@ public class Client extends Observable implements Runnable,
 
 		this.announce.start();
 		this.service.start();
+		this.generator.start();
 
 		int optimisticIterations = 0;
 		int rateComputationIterations = 0;

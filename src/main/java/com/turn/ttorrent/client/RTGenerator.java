@@ -75,10 +75,10 @@ public class RTGenerator implements Runnable {
 				.getFileDescriptors();
 
 		for (RTTorrentFileDescriptor d : descriptors) {
-			if (pieceIndex * torrent.getPieceLength() <= offset) {
-				descriptor = d;
+			if (pieceIndex * torrent.getPieceLength() < offset) {
 				break;
 			}
+			descriptor=d;
 			offset += d.getLength();
 		}
 
@@ -94,7 +94,7 @@ public class RTGenerator implements Runnable {
 		 * number in this parameter for each part and keep all other parameters
 		 * identical.
 		 */
-		int partIndex = (int) (pieceIndex % offset);
+		int partIndex = (int) (offset!=0 ? pieceIndex % offset : offset);
 
 		Runtime rt = Runtime.getRuntime();
 		Process pr;
@@ -107,15 +107,26 @@ public class RTGenerator implements Runnable {
 		int exitVal;
 		if ((exitVal = pr.waitFor()) != 0)
 			throw new Exception("rtgen exited with error code " + exitVal);
-		pr = rt.exec(new String[] { rtgenPath + "rtsort.exe",
+        BufferedReader input = new BufferedReader(new InputStreamReader(pr.getInputStream()));
+        String line=null;
+        while((line=input.readLine()) != null) {
+            System.out.println(line);
+        }
+        
+		/*pr = rt.exec(new String[] { rtgenPath + "rtsort.exe",
 				descriptor.getPath() });
 		if ((exitVal = pr.waitFor()) != 0)
 			throw new Exception("rtsort exited with error code " + exitVal);
-
+		
+		while((line=input.readLine()) != null) {
+            System.out.println(line);
+        }*/
+		
 		Piece p = torrent.getPiece(pieceIndex);
 		String rtFilename=hashAlgorithm+"_"+charset+"#"+plaintextLenMin+"-"+plaintextLenMax+"_"+tableIndex+"_"+chainLength+"x"+chainNum+"_"+partIndex+".rt";
 
-		ByteBuffer generatdFileAsByteBuffer=ByteBuffer.wrap((Files.readAllBytes(Paths.get(rtgenPath+rtFilename))));
+		System.out.println(Paths.get(rtFilename));
+		ByteBuffer generatdFileAsByteBuffer=ByteBuffer.wrap((Files.readAllBytes(Paths.get(rtFilename))));
 		p.record(generatdFileAsByteBuffer, 0);
 
 		return p;

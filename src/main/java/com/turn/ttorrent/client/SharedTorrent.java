@@ -92,7 +92,7 @@ public class SharedTorrent extends Torrent implements PeerActivityListener {
 	private final TorrentByteStorage bucket;
 
 	private final int pieceLength;
-	private final ByteBuffer piecesHashes;
+	//private final ByteBuffer piecesHashes;
 
 	private boolean initialized;
 	private Piece[] pieces;
@@ -182,14 +182,14 @@ public class SharedTorrent extends Torrent implements PeerActivityListener {
 
 		try {
 			this.pieceLength = this.decoded_info.get("piece length").getInt();
-			this.piecesHashes = ByteBuffer.wrap(this.decoded_info.get("pieces")
+			/*this.piecesHashes = ByteBuffer.wrap(this.decoded_info.get("pieces")
 					.getBytes());
 
 			if (this.piecesHashes.capacity() / Torrent.PIECE_HASH_SIZE *
 					(long)this.pieceLength < this.getSize()) {
 				throw new IllegalArgumentException("Torrent size does not " +
 						"match the number of pieces and the piece size!");
-			}
+			}*/
 		} catch (InvalidBEncodingException ibee) {
 			throw new IllegalArgumentException(
 					"Error reading torrent meta-info fields!");
@@ -336,7 +336,7 @@ public class SharedTorrent extends Torrent implements PeerActivityListener {
 
 		this.pieces = new Piece[nPieces];
 		this.completedPieces = new BitSet(nPieces);
-		this.piecesHashes.clear();
+		//this.piecesHashes.clear();
 
 		ExecutorService executor = Executors.newFixedThreadPool(threads);
 		List<Future<Piece>> results = new LinkedList<Future<Piece>>();
@@ -345,8 +345,8 @@ public class SharedTorrent extends Torrent implements PeerActivityListener {
 			logger.info("Analyzing local data for {} with {} threads ({} pieces)...",
 				new Object[] { this.getName(), threads, nPieces });
 			for (int idx=0; idx<nPieces; idx++) {
-				byte[] hash = new byte[Torrent.PIECE_HASH_SIZE];
-				this.piecesHashes.get(hash);
+				/*byte[] hash = new byte[Torrent.PIECE_HASH_SIZE];
+				this.piecesHashes.get(hash);*/
 
 				// The last piece may be shorter than the torrent's global piece
 				// length. Let's make sure we get the right piece length in any

@@ -314,10 +314,19 @@ public class Torrent {
 	}*/
 	
 
-	// ----------------------------------------------------------------------------------------------
-	// Start of modification : RT Torrent .
-	// ----------------------------------------------------------------------------------------------
-	
+	/**
+	 * @author Thomas Rouvinez
+	 * 
+	 * Create a new torrent from meta-info binary data.
+	 *
+	 * Parses the meta-info data (which should be B-encoded as described in the
+	 * BitTorrent specification) and create a Torrent object from it.
+	 *
+	 * @param torrent The meta-info byte data.
+	 * @param seeder Whether we'll be seeding for this torrent or not.
+	 * @throws IOException When the info dictionary can't be read or
+	 * encoded and hashed back to create the torrent's SHA-1 hash.
+	 */
 	public Torrent(byte[] torrent, boolean seeder) throws IOException {
 		// Variables.
 		this.encoded = torrent;
@@ -332,23 +341,26 @@ public class Torrent {
 		this.info_hash = Torrent.hash(this.encoded_info);
 		this.hex_info_hash = Torrent.byteArrayToHexString(this.info_hash);
 
-		//Parses the announce information from the decoded meta-info structure.
+		// Parses the announce information from the decoded meta-info structure.
 		try {
 			this.trackers = new ArrayList<List<URI>>();
 			this.allTrackers = new HashSet<URI>();
 
 			if(this.decoded.containsKey("announce")) {
-				this.announce = (new URI(this.decoded.get("announce").getString()));
+				URI tracker = new URI(this.decoded.get("announce").getString());
+				this.allTrackers.add(tracker);
+
+				// Build a single-tier announce list.
+				List<URI> tier = new ArrayList<URI>();
+				tier.add(tracker);
+				this.trackers.add(tier);
 			}
 			
 		} catch (URISyntaxException use) {
 			throw new IOException(use);
 		}
 		
-		// -------------------------------------------------------------------------------------------
 		// Decoding informations.
-		// -------------------------------------------------------------------------------------------
-
 		this.creationDate = this.decoded.containsKey("creation date")
 			? new Date(this.decoded.get("creation date").getLong() * 1000)
 			: null;
@@ -388,10 +400,7 @@ public class Torrent {
 		this.name = this.decoded_info.get("name").getString();
 		this.files = new LinkedList<TorrentFile>();
 		
-		// -------------------------------------------------------------------------------------------
 		// Parse multi-file torrent file information structure.
-		// -------------------------------------------------------------------------------------------
-		
 		if (this.decoded_info.containsKey("files")) {
 			for (BEValue file : this.decoded_info.get("files").getList()) {
 				Map<String, BEValue> fileInfo = file.getMap();
@@ -406,11 +415,8 @@ public class Torrent {
 					fileInfo.get("length").getLong(), fileInfo.get("table index").getInt()));
 			}
 		}
-
-		// -------------------------------------------------------------------------------------------
-		// Calculate the total size of this torrent from its files' sizes.
-		// -------------------------------------------------------------------------------------------
 		
+		// Calculate the total size of this torrent from its files' sizes.
 		long size = 0;
 		
 		for (TorrentFile file : this.files) {
@@ -419,10 +425,6 @@ public class Torrent {
 		
 		this.size = size;	
 	}
-	
-	// ------------------------------------------------------------------------------------------------
-	// End of modification.
-	// ------------------------------------------------------------------------------------------------
 
 	/**
 	 * Get this torrent's name.
@@ -966,11 +968,7 @@ public class Torrent {
 			throw new IOException("Error while hashing the torrent data!", ee);
 		}
 	}
-
-	// ------------------------------------------------------------------------------
-	// Getters && Setters for RT Torrents' specific information.
-	// ------------------------------------------------------------------------------
-
+	
 	public int getChainLength() {
 		return chainLength;
 	}
