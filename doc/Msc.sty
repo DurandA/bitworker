@@ -1,0 +1,172 @@
+% Msc.sty
+% A small package for Master in Computer Sicence UNIVERSITY of FREIBURG. It makes sure that the
+% title page layout is as required.
+%
+% This style has been strongly modified from the style used at the University
+% of Geneva, Vision Group and is similar to the one used in the diuf of the
+% University of Fribourg
+%
+% Author : Thomas Rouvinez 2012
+%
+%%%%%%
+%
+% Identification
+%
+%%%%%%
+%
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{hevsiigtr}
+
+%%%%%%
+%
+% Package loading
+%
+%%%%%%
+%
+\RequirePackage{graphics}
+\RequirePackage{rotating}
+%
+%%%%%%
+%
+% Body of Package
+%
+%%%%%%
+%
+% set up the page dimensions. This assumes a4 paper.
+%
+% vertical
+\voffset -13mm
+\topmargin 0mm
+\headheight 5mm
+\headsep 12.5mm
+\textheight 235mm
+%
+% horizontal
+\hoffset 0mm
+\oddsidemargin 5mm
+\textwidth 150mm
+%
+\reversemarginpar
+% set up new commands for defining the email address and tech. report no.,
+% etc.
+%
+\newcommand*{\email}[1]{\textsf{#1}}
+\newcommand*{\rrno}[1]{\gdef\@rrno{#1}}
+\newcommand*{\course}[1]{\gdef\@course{#1}}
+\newcommand*{\professor}[1]{\gdef\@professor{#1}}
+\newcommand*{\acceptedfor}[1]{\gdef\@acceptedfor{#1}}
+% set up the stuff for the multiple addresses
+\let\addresses\@empty
+\newcounter{addressno}
+\newcommand{\address}[2][]{%
+        \stepcounter{addressno}%
+        % print the address number like a footnote
+        \raisebox{0.6ex}{\small\theaddressno}%
+        % store the address for later printing
+        \protected@edef\@tempa{\protect\StoreAddress{\theaddressno}}%
+        \@tempa{#1}{#2}%
+}
+\newcommand\StoreAddress[3]{% store the address for later printing
+  \g@addto@macro\addresses{\par\raisebox{0.6ex}{\small#1}#2{#3}}%
+}
+%
+\newcommand{\keywords}[1]{\begin{center}{\bfseries Keywords:} #1\end{center}}
+
+%
+% redefine maketitle to do what we want
+%
+\renewcommand\maketitle{\begin{titlepage}%
+\let\footnotesize\small
+%\let\footnoterule\relax
+\let \footnote \thanks
+\renewcommand{\thefootnote}{\arabic{footnote}}
+\newlength{\datewordlength}
+\settowidth{\datewordlength}{\large Date: }
+\newlength{\datelength}
+\settowidth{\datelength}{\large \@date}
+\noindent
+
+
+\begin{center}
+\includegraphics[scale= 1]{logo.png}\\
+\end{center}
+\vspace{3mm}
+
+%\hspace*{\fill}
+%\parbox[b]{\datewordlength}{%
+%\large
+%Date: \\
+%N${}^\mathrm{o}$
+%}%
+%\parbox[b]{\datelength}{%
+%\large
+%\@date\\
+%\@rrno
+%}%
+
+\begin{center}%
+    
+    {\huge \textsc \@title \vskip \baselineskip \par}%
+	{\Large{\textsc{\@course}}}%
+    
+    {\Large
+     \begin{tabular}[t]{c}%
+        
+     \end{tabular} \vskip \baselineskip \par}%
+	
+    %\vfill%
+	
+	\vspace{100mm}
+	
+    {Students: \textsc \@author} 
+	\\*
+    {Professors: \@professor}
+	\\*
+	{\textsc \@date}
+    
+	\vspace{3mm}
+	
+    %\footnotesize{\textsc{IIG Research Report}} 
+    %\par
+    %{\parskip .5em \footnotesize Department of Informatics $\bullet$ 3012 Bern $\bullet$ Switzerland \par}
+    \vskip \baselineskip \par
+    \footnotesize{
+            University of Bern
+			\thanks{University of  ,
+			\email{\url{www.unibe.ch}}} \\
+            Msc. Computer Science $\bullet$ 3012~Bern $\bullet$ Switzerland 
+            \vskip \baselineskip \par
+            }
+    \par
+    
+\end{center}\par
+\@ifundefined{@acceptedfor}{}{%
+    \baselineskip%
+    \parbox[t]{150mm}{%
+    \small
+    {\bfseries Accepted for:} \@acceptedfor
+    }
+}
+\@thanks
+\null
+\end{titlepage}%
+
+\setcounter{footnote}{0}%
+\global\let\thanks\relax
+\global\let\maketitle\relax
+\global\let\@thanks\@empty
+\global\let\@author\@empty
+\global\let\@professor\@empty
+\global\let\@date\@empty
+\global\let\@title\@empty
+\global\let\@rrno\@empty
+\global\let\@acceptedfor\@empty
+\global\let\@email\@empty
+\global\let\title\relax
+\global\let\author\relax
+\global\let\professor\relax
+\global\let\date\relax
+\global\let\and\relax
+\global\let\rrno\relax
+\global\let\email\relax
+}

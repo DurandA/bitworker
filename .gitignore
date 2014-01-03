@@ -2,10 +2,10 @@
 # Author: Maxime Petazzoni <mpetazzoni@turn.com>
 
 # Ignore build output
-/build/*
+#/build/*
 
 # Ignore Javadoc output
-/doc/*
+#/doc/*
 
 /bin/*
 
