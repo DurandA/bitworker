@@ -241,9 +241,10 @@ This project being a proof of concept, we chose strategy number 2 for its ease o
 
 With all the previously mentioned modifications brought to the code, the regular torrent client could not work anymore without adaptations :
 
+\vspace{2mm}
 \begin{figure}[H]
   \centering
-    \includegraphics[scale=0.185]{works.png}
+    \includegraphics[scale=0.25]{works.png}
     \caption{Client workflow}
     \label{works}
 \end{figure}
@@ -257,11 +258,45 @@ TO COMPLETE
 
 \section{Experiments and results}
 
-To test our library, we created a custom torrent containing two file, each made of 32 pieces. Each piece weighs one MB. We chose to use small pieces with a small charset length for the purpose of demonstration : with such parameters, we can generate a new piece roughly every 15 seconds.\\
+To test our library, we created a custom torrent containing two file, each made of 32 pieces. Each piece weighs one MB. We chose to use small pieces with a small charset length for the purpose of demonstration.\\
+
+To test our application we have used Amazon EC2 instances\footnote{See \url{http://aws.amazon.com/ec2/instance-types/}}. To simulate a torrent-like network, we used 9 EC2 instances : one micro instance for the bittorrent tracker and up to eight small instances for the peers that generate and share the pieces of the table. We have tested with 2, 4, and 8 peers to follow a logarithmic growth. Figure \ref{graph1} shows the 8 peer instances running under Windows Server 2012, each with CPU capacity of one EC2 Compute Unit. We choose settings for the generation that suited well our hardware configuration : 60 pieces each 1 MB small. The time needed to generate it on one machine is 70 minutes.
+
+\vspace{3mm}
+\begin{figure}[H]
+  \centering
+    \includegraphics[scale=0.335]{graph1.png}
+    \caption{EC2 instances}
+    \label{graph1}
+\end{figure}
+\vspace{2mm}
+
+Figure \ref{graph2} depicts the time of completion (combination of download and generation) of the same torrent. We can see that it takes 70 minutes with a single machine and for example 12 minutes with 8 machines. We draw the conclusions that the generation time is significantly decreased with each added machine :
+
+\vspace{3mm}
+\begin{figure}[H]
+  \centering
+    \includegraphics[scale=0.7]{graph2.png}
+    \caption{Computation time improvements}
+    \label{graph2}
+\end{figure}
+\vspace{2mm}
+
+Figure \ref{graph3} renders the theoretical maximum acceleration with each added machine compared to the real EC2 experience. With random piece selection technique (blue line) we see a growing gap because each machine choose randomly which currently unavailable piece to generate and at the same time an other may also select the same piece. This yields duplicates. With 8 machines, instead of decreasing the total generation time by a factor of 8 it is divided by a factor closer to 6.
+
+\vspace{3mm}
+\begin{figure}[H]
+  \centering
+    \includegraphics[scale=0.7]{graph3.png}
+    \caption{Execution speed improvements}
+    \label{graph3}
+\end{figure}
+\vspace{2mm}
+
 
 \section{Drawbacks}
 
-A few drawbacks are inherent to P2P distributed computing \& sharing mechanism :\\
+A few drawbacks are inherent to P2P distributed computing and  sharing mechanisms :\\
 
 \begin{description}
 	\item [No chunk verification : ] Verifying chunks is as costly as generating them. It is possible to measure trustfulness statistically by randomly analysing incoming chunks but it is very costly and does not ensure 100\% uncorrupted data. Another approach would be to have a voting system between peers to trust other peers. But it would be easy to cheat by having a lot of peers connected to the network.\\
@@ -282,9 +317,9 @@ Being a proof of concept, this project's main focus is to provide a working RTTo
 
 \section{Conclusions}
 
-Through this project we have proven that the BitTorrent protocol, given the right modifications, can accommodate distributed computations. Not only the workload is shared among the peers, but the original purpose of BitTorrent allows to share and store quickly the generated chunks together. It is also interesting to notice that neither the BitTorrent exchange protocol nor the BitTorrent tracker protocol are changed. This enable our client to use any generic tracker.\\
+Through this project we have proven that the BitTorrent protocol, given the right modifications, can accommodate distributed computations. Not only the workload is shared among the peers, but the original purpose of BitTorrent allows to share and store quickly the generated chunks together. The closest work we found on this topic was DistrRTgen\footnote{See \url{https://www.freerainbowtables.com/}} which distributively computes rainbow tables in a classical manner and then upload their generated content to a server. This is the main advantage of our implementation as we combine generation and sharing, thus automating file management and easing work distribution. It is also interesting to notice that neither the BitTorrent exchange protocol nor the BitTorrent tracker protocol required changes to accomodate our RTorrent. This enables our client to use any generic tracker.\\
 
-From a more conceptual perspective RTTorrents are an example of how distributed computations can be achieved via BitTorrent. Nevertheless all types of computations may not apply correctly to this process since we need precomputed chunk sizes.\\
+From a more conceptual perspective RTorrents are an example of how distributed computations can be achieved via BitTorrent. Nevertheless all types of computations may not apply correctly to this process since we need pre-computed chunk sizes to make it work. With the actual computation dedicated to a callable program it is possible to adapt this library to other types of computations than rainbow tables generation. Given a cluster of servers with high processing power and direct links between them, RTorrents performances and inherent data sharing can improve performances and reduce the data gathering overhead. But this application could become handy when it comes to crowd processing power use for massive computations.\\
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % End of document.
