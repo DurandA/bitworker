@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.4-1.40.13 (MiKTeX 2.9) (preloaded format=pdflatex 2013.12.31)  6 JAN 2014 11:27
+This is pdfTeX, Version 3.1415926-2.4-1.40.13 (MiKTeX 2.9) (preloaded format=pdflatex 2013.12.31)  6 JAN 2014 12:31
 entering extended mode
 **template.tex
 (C:\Users\Bill\Documents\GitHub\drttor\doc\template.tex
@@ -920,15 +920,11 @@ Underfull \hbox (badness 10000) in paragraph at lines 261--262
 
  []
 
-<figures/graph1.png, id=137, 1381.16pt x 338.26375pt>
+<figures/graph1.png, id=137, 827.09pt x 338.26375pt>
 File: figures/graph1.png Graphic file (type png)
  <use figures/graph1.png>
 Package pdftex.def Info: figures/graph1.png used on input line 268.
-(pdftex.def)             Requested size: 462.69673pt x 113.32034pt.
-
-Overfull \hbox (1.76173pt too wide) in paragraph at lines 268--269
- [][] 
- []
+(pdftex.def)             Requested size: 459.02776pt x 187.73343pt.
 
 <figures/graph2.png, id=139, 482.80376pt x 289.08pt>
 File: figures/graph2.png Graphic file (type png)
@@ -1025,7 +1021,7 @@ fonts/type1/public/amsfonts/cm/cmr9.pfb><C:/Program Files (x86)/MiKTeX 2.9/font
 s/type1/public/amsfonts/cm/cmsy10.pfb><C:/Program Files (x86)/MiKTeX 2.9/fonts/
 type1/public/amsfonts/cm/cmsy9.pfb><C:/Program Files (x86)/MiKTeX 2.9/fonts/typ
 e1/urw/courier/ucrr8a.pfb>
-Output written on template.pdf (9 pages, 466614 bytes).
+Output written on template.pdf (9 pages, 444560 bytes).
 PDF statistics:
  213 PDF objects out of 1000 (max. 8388607)
  39 named destinations out of 1000 (max. 500000)
