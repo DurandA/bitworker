@@ -1,15 +1,15 @@
-This is pdfTeX, Version 3.1415926-2.4-1.40.13 (MiKTeX 2.9) (preloaded format=pdflatex 2013.12.31)  6 JAN 2014 12:31
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (MiKTeX 2.9) (preloaded format=pdflatex 2014.1.6)  6 JAN 2014 20:33
 entering extended mode
 **template.tex
-(C:\Users\Bill\Documents\GitHub\drttor\doc\template.tex
+(C:\Users\duranda1\Documents\GitHub\drttor\doc\template.tex
 LaTeX2e <2011/06/27>
 Babel <v3.8m> and hyphenation patterns for english, afrikaans, ancientgreek, ar
 abic, armenian, assamese, basque, bengali, bokmal, bulgarian, catalan, coptic, 
 croatian, czech, danish, dutch, esperanto, estonian, farsi, finnish, french, ga
-lician, german, german-x-2012-05-30, greek, gujarati, hindi, hungarian, iceland
+lician, german, german-x-2013-05-26, greek, gujarati, hindi, hungarian, iceland
 ic, indonesian, interlingua, irish, italian, kannada, kurmanji, latin, latvian,
  lithuanian, malayalam, marathi, mongolian, mongolianlmc, monogreek, ngerman, n
-german-x-2012-05-30, nynorsk, oriya, panjabi, pinyin, polish, portuguese, roman
+german-x-2013-05-26, nynorsk, oriya, panjabi, pinyin, polish, portuguese, roman
 ian, russian, sanskrit, serbian, slovak, slovenian, spanish, swedish, swissgerm
 an, tamil, telugu, turkish, turkmen, ukenglish, ukrainian, uppersorbian, usengl
 ishmax, welsh, loaded.
@@ -171,7 +171,7 @@ Package grfext Info: Graphics extension search list:
 (grfext)             [.pdf,.png,.eps]
 (grfext)             \AppendGraphicsExtensions on input line 452.
 ))
-(C:\Users\Bill\AppData\Roaming\MiKTeX\2.9\tex\latex\fancyhdr\fancyhdr.sty
+(C:\Users\duranda1\AppData\Roaming\MiKTeX\2.9\tex\latex\fancyhdr\fancyhdr.sty
 \fancy@headwidth=\skip46
 \f@ncyO@elh=\skip47
 \f@ncyO@erh=\skip48
@@ -217,7 +217,7 @@ Package babel Info: Making ? an active character on input line 123.
 *
 ("C:\Program Files (x86)\MiKTeX 2.9\tex\generic\babel\frenchb.cfg")))
 ("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\carlisle\scalefnt.sty")
-(C:\Users\Bill\AppData\Roaming\MiKTeX\2.9\tex\latex\xcolor\xcolor.sty
+(C:\Users\duranda1\AppData\Roaming\MiKTeX\2.9\tex\latex\xcolor\xcolor.sty
 Package: xcolor 2007/01/21 v2.11 LaTeX color extensions (UK)
 
 ("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\00miktex\color.cfg"
@@ -234,7 +234,7 @@ Package xcolor Info: Model `HSB' substituted by `hsb' on input line 1358.
 Package xcolor Info: Model `Gray' substituted by `gray' on input line 1359.
 Package xcolor Info: Model `wave' substituted by `hsb' on input line 1360.
 )
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\ltxmisc\url.sty"
+(C:\Users\duranda1\AppData\Roaming\MiKTeX\2.9\tex\latex\url\url.sty
 \Urlmuskip=\muskip11
 Package: url 2006/04/12  ver 3.3  Verb mode for urls, etc.
 )
@@ -418,10 +418,10 @@ Package textcomp Info: Setting ptmj sub-encoding to TS1/4 on input line 340.
 ("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\psnfss\courier.sty"
 Package: courier 2005/04/12 PSNFSS-v9.2a (WaS) 
 )
-(C:\Users\Bill\AppData\Roaming\MiKTeX\2.9\tex\latex\caption\caption.sty
+(C:\Users\duranda1\AppData\Roaming\MiKTeX\2.9\tex\latex\caption\caption.sty
 Package: caption 2013/05/02 v3.3-89 Customizing captions (AR)
 
-(C:\Users\Bill\AppData\Roaming\MiKTeX\2.9\tex\latex\caption\caption3.sty
+(C:\Users\duranda1\AppData\Roaming\MiKTeX\2.9\tex\latex\caption\caption3.sty
 Package: caption3 2013/05/02 v1.6-88 caption3 kernel (AR)
 Package caption3 Info: TeX engine: e-TeX on input line 57.
 \captionmargin=\dimen119
@@ -443,7 +443,7 @@ Package: float 2001/11/08 v1.3d Float enhancements (AL)
 \@float@everytoks=\toks21
 \@floatcapt=\box29
 )
-(C:\Users\Bill\AppData\Roaming\MiKTeX\2.9\tex\latex\ntheorem\ntheorem.sty
+(C:\Users\duranda1\AppData\Roaming\MiKTeX\2.9\tex\latex\ntheorem\ntheorem.sty
 Style `ntheorem', Version 1.33 <2011/08/15>
 Package: ntheorem 2011/08/15 1.33
 ("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\base\ifthen.sty"
@@ -484,7 +484,7 @@ Package: ifthen 2001/05/26 v1.1c Standard LaTeX ifthen package (DPC)
 ("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\oberdiek\hypcap.sty"
 Package: hypcap 2011/02/16 v1.11 Adjusting the anchors of captions (HO)
 )
-(C:\Users\Bill\AppData\Roaming\MiKTeX\2.9\tex\latex\framed\framed.sty
+(C:\Users\duranda1\AppData\Roaming\MiKTeX\2.9\tex\latex\framed\framed.sty
 Package: framed 2011/10/22 v 0.96: framed or shaded text with page breaks
 \OuterFrameSep=\skip64
 \fb@frw=\dimen130
@@ -493,7 +493,7 @@ Package: framed 2011/10/22 v 0.96: framed or shaded text with page breaks
 \FrameSep=\dimen133
 )
 ("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\pstricks\pstricks.sty"
-Package: pstricks 2012/08/24 v0.53 LaTeX wrapper for `PSTricks' (RN,HV)
+Package: pstricks 2013/12/12 v0.60 LaTeX wrapper for `PSTricks' (RN,HV)
 
 ("C:\Program Files (x86)\MiKTeX 2.9\tex\generic\pstricks\base\pstricks.tex"
 ("C:\Program Files (x86)\MiKTeX 2.9\tex\generic\xkeyval\pst-xkey.tex"
@@ -520,21 +520,21 @@ File: xkeyval.tex 2012/10/14 v2.6b key=value parser (HA)
 \pstFP@regs=\count123
 \pstFP@times=\count124
 )
-(C:\Users\Bill\AppData\Roaming\MiKTeX\2.9\tex\generic\pgf\utilities\pgfutil-com
-mon.tex
+(C:\Users\duranda1\AppData\Roaming\MiKTeX\2.9\tex\generic\pgf\utilities\pgfutil
+-common.tex
 \pgfutil@everybye=\toks43
 )
-(C:\Users\Bill\AppData\Roaming\MiKTeX\2.9\tex\generic\pgf\utilities\pgfkeys.cod
-e.tex
+(C:\Users\duranda1\AppData\Roaming\MiKTeX\2.9\tex\generic\pgf\utilities\pgfkeys
+.code.tex
 \pgfkeys@pathtoks=\toks44
 \pgfkeys@temptoks=\toks45
 
-(C:\Users\Bill\AppData\Roaming\MiKTeX\2.9\tex\generic\pgf\utilities\pgfkeysfilt
-ered.code.tex
+(C:\Users\duranda1\AppData\Roaming\MiKTeX\2.9\tex\generic\pgf\utilities\pgfkeys
+filtered.code.tex
 \pgfkeys@tmptoks=\toks46
 ))
-(C:\Users\Bill\AppData\Roaming\MiKTeX\2.9\tex\generic\pgf\utilities\pgffor.code
-.tex
+(C:\Users\duranda1\AppData\Roaming\MiKTeX\2.9\tex\generic\pgf\utilities\pgffor.
+code.tex
 \pgffor@iter=\dimen134
 \pgffor@skip=\dimen135
 \pgffor@stack=\toks47
@@ -542,7 +542,7 @@ ered.code.tex
 )
 \psLoopIndex=\count125
 
-`PSTricks' v2.35  <2012/12/21> (tvz)
+`PSTricks' v2.49b  <2013/12/21> (tvz)
 \pst@dima=\dimen136
 \pst@dimb=\dimen137
 \pst@dimc=\dimen138
@@ -584,58 +584,58 @@ ered.code.tex
 \everypsbox=\toks51
 \psframesep=\dimen156
 \pslabelsep=\dimen157
-\pst@shift=\dimen158
-\theoverlaybox=\box33
+\sh@wgridXunit=\dimen158
+\sh@wgridYunit=\dimen159
+\pst@shift=\dimen160
 )
-File: pstricks.tex 2012/12/21 v2.35 `PSTricks' (tvz,hv)
+File: pstricks.tex 2013/12/21 v2.49b `PSTricks' (tvz,hv)
 
 ("C:\Program Files (x86)\MiKTeX 2.9\tex\generic\pstricks\base\pst-fp.tex")
-File: pst-fp.tex 2012/12/21 v2.35 `PST-fp' (hv)
+File: pst-fp.tex 2013/12/21 v2.49b `PST-fp' (hv)
 )
-(C:\Users\Bill\AppData\Roaming\MiKTeX\2.9\tex\latex\listings\listings.sty
+(C:\Users\duranda1\AppData\Roaming\MiKTeX\2.9\tex\latex\listings\listings.sty
 \lst@mode=\count138
-\lst@gtempboxa=\box34
+\lst@gtempboxa=\box33
 \lst@token=\toks52
 \lst@length=\count139
-\lst@currlwidth=\dimen159
+\lst@currlwidth=\dimen161
 \lst@column=\count140
 \lst@pos=\count141
-\lst@lostspace=\dimen160
-\lst@width=\dimen161
+\lst@lostspace=\dimen162
+\lst@width=\dimen163
 \lst@newlines=\count142
 \lst@lineno=\count143
-\lst@maxwidth=\dimen162
+\lst@maxwidth=\dimen164
 
-(C:\Users\Bill\AppData\Roaming\MiKTeX\2.9\tex\latex\listings\lstmisc.sty
+(C:\Users\duranda1\AppData\Roaming\MiKTeX\2.9\tex\latex\listings\lstmisc.sty
 File: lstmisc.sty 2013/08/26 1.5b (Carsten Heinz)
 \c@lstnumber=\count144
 \lst@skipnumbers=\count145
-\lst@framebox=\box35
+\lst@framebox=\box34
 )
-(C:\Users\Bill\AppData\Roaming\MiKTeX\2.9\tex\latex\listings\listings.cfg
+(C:\Users\duranda1\AppData\Roaming\MiKTeX\2.9\tex\latex\listings\listings.cfg
 File: listings.cfg 2013/08/26 1.5b listings configuration
 ))
 Package: listings 2013/08/26 1.5b (Carsten Heinz)
-
 ("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\base\makeidx.sty"
 Package: makeidx 2000/03/29 v1.0m Standard LaTeX package
 )
-(C:\Users\Bill\AppData\Roaming\MiKTeX\2.9\tex\latex\enumitem\enumitem.sty
+(C:\Users\duranda1\AppData\Roaming\MiKTeX\2.9\tex\latex\enumitem\enumitem.sty
 Package: enumitem 2011/09/28 v3.5.2 Customized lists
 \labelindent=\skip65
-\enit@outerparindent=\dimen163
+\enit@outerparindent=\dimen165
 \enit@toks=\toks53
-\enit@inbox=\box36
+\enit@inbox=\box35
 \enitdp@description=\count146
 )
-(C:\Users\Bill\AppData\Roaming\MiKTeX\2.9\tex\latex\acronym\acronym.sty
+(C:\Users\duranda1\AppData\Roaming\MiKTeX\2.9\tex\latex\acronym\acronym.sty
 Package: acronym 2012/10/29 v1.38 Support for acronyms (Tobias Oetiker)
 
-(C:\Users\Bill\AppData\Roaming\MiKTeX\2.9\tex\latex\bigfoot\suffix.sty
+(C:\Users\duranda1\AppData\Roaming\MiKTeX\2.9\tex\latex\bigfoot\suffix.sty
 Package: suffix 2006/07/15 1.5 Variant command support
 )
-(C:\Users\Bill\AppData\Roaming\MiKTeX\2.9\tex\latex\xstring\xstring.sty
-(C:\Users\Bill\AppData\Roaming\MiKTeX\2.9\tex\generic\xstring\xstring.tex
+(C:\Users\duranda1\AppData\Roaming\MiKTeX\2.9\tex\latex\xstring\xstring.sty
+(C:\Users\duranda1\AppData\Roaming\MiKTeX\2.9\tex\generic\xstring\xstring.tex
 \@xs@message=\write3
 \integerpart=\count147
 \decimalpart=\count148
@@ -643,25 +643,24 @@ Package: suffix 2006/07/15 1.5 Variant command support
 Package: xstring 2013/10/13  v1.7c  String manipulations (C Tellechea)
 )
 \AC@clearlist=\toks54
-)
-(C:\Users\Bill\Documents\GitHub\drttor\doc\Msc.sty
+) (C:\Users\duranda1\Documents\GitHub\drttor\doc\Msc.sty
 
 LaTeX Warning: You have requested package `Msc',
                but the package provides `hevsiigtr'.
 
 Package: hevsiigtr 
-(C:\Users\Bill\AppData\Roaming\MiKTeX\2.9\tex\latex\rotating\rotating.sty
+(C:\Users\duranda1\AppData\Roaming\MiKTeX\2.9\tex\latex\rotating\rotating.sty
 Package: rotating 2009/03/28 v2.16a rotated objects in LaTeX
 
 ("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\graphics\graphicx.sty"
 Package: graphicx 1999/02/16 v1.0f Enhanced LaTeX Graphics (DPC,SPQR)
-\Gin@req@height=\dimen164
-\Gin@req@width=\dimen165
+\Gin@req@height=\dimen166
+\Gin@req@width=\dimen167
 )
 \c@r@tfl@t=\count149
 \rotFPtop=\skip66
 \rotFPbot=\skip67
-\rot@float@box=\box37
+\rot@float@box=\box36
 \rot@mess@toks=\toks55
 )
 \c@addressno=\count150
@@ -671,29 +670,28 @@ Package: geometry 2010/09/12 v5.6 Page Geometry
 \Gm@cnth=\count151
 \Gm@cntv=\count152
 \c@Gm@tempcnt=\count153
-\Gm@bindingoffset=\dimen166
-\Gm@wd@mp=\dimen167
-\Gm@odd@mp=\dimen168
-\Gm@even@mp=\dimen169
-\Gm@layoutwidth=\dimen170
-\Gm@layoutheight=\dimen171
-\Gm@layouthoffset=\dimen172
-\Gm@layoutvoffset=\dimen173
+\Gm@bindingoffset=\dimen168
+\Gm@wd@mp=\dimen169
+\Gm@odd@mp=\dimen170
+\Gm@even@mp=\dimen171
+\Gm@layoutwidth=\dimen172
+\Gm@layoutheight=\dimen173
+\Gm@layouthoffset=\dimen174
+\Gm@layoutvoffset=\dimen175
 \Gm@dimlist=\toks56
 
 ("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\geometry\geometry.cfg"))
 \@input{settings.aux}
-(C:\Users\Bill\Documents\GitHub\drttor\doc\settings.tex
+(C:\Users\duranda1\Documents\GitHub\drttor\doc\settings.tex
 Package hyperref Info: Option `colorlinks' set `true' on input line 30.
 \c@definition=\count154
 \c@remark=\count155
 \c@seobs=\count156
 \c@programoutput=\count157
 
-(C:\Users\Bill\AppData\Roaming\MiKTeX\2.9\tex\latex\listings\lstlang1.sty
+(C:\Users\duranda1\AppData\Roaming\MiKTeX\2.9\tex\latex\listings\lstlang1.sty
 File: lstlang1.sty 2013/08/26 1.5b listings language file
-))
-(C:\Users\Bill\Documents\GitHub\drttor\doc\template.aux
+)) (C:\Users\duranda1\Documents\GitHub\drttor\doc\template.aux
 
 LaTeX Warning: Label `principle' multiply defined.
 
@@ -719,16 +717,16 @@ File: ts1cmr.fd 1999/05/25 v2.5h Standard LaTeX font definitions
 )
 LaTeX Font Info:    ... okay on input line 58.
 
-(C:\Users\Bill\AppData\Roaming\MiKTeX\2.9\tex\context\base\supp-pdf.mkii
+(C:\Users\duranda1\AppData\Roaming\MiKTeX\2.9\tex\context\base\supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
 \scratchcounter=\count158
-\scratchdimen=\dimen174
-\scratchbox=\box38
+\scratchdimen=\dimen176
+\scratchbox=\box37
 \nofMPsegments=\count159
 \nofMParguments=\count160
 \everyMPshowfont=\toks57
 \MPscratchCnt=\count161
-\MPscratchDim=\dimen175
+\MPscratchDim=\dimen177
 \MPnumerator=\count162
 \makeMPintoPDFobject=\count163
 \everyMPtoPDFconversion=\toks58
@@ -742,7 +740,7 @@ Package frenchb.ldf Warning: OT1 encoding should not be used for French.
 (frenchb.ldf)                Add \usepackage[T1]{fontenc} to the preamble
 (frenchb.ldf)                of your document, on input line 58.
 
-\AtBeginShipoutBox=\box39
+\AtBeginShipoutBox=\box38
 Package hyperref Info: Link coloring ON on input line 58.
 ("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\hyperref\nameref.sty"
 Package: nameref 2012/10/27 v2.43 Cross-referencing by name of section
@@ -756,8 +754,8 @@ LaTeX Info: Redefining \ref on input line 58.
 LaTeX Info: Redefining \pageref on input line 58.
 LaTeX Info: Redefining \nameref on input line 58.
 
-(C:\Users\Bill\Documents\GitHub\drttor\doc\template.out)
-(C:\Users\Bill\Documents\GitHub\drttor\doc\template.out)
+(C:\Users\duranda1\Documents\GitHub\drttor\doc\template.out)
+(C:\Users\duranda1\Documents\GitHub\drttor\doc\template.out)
 \@outlinefile=\write4
 Package caption Info: Begin \AtBeginDocument code.
 Package caption Info: float package is loaded.
@@ -832,11 +830,12 @@ Non-PDF special ignored!
 
 Non-PDF special ignored!
 Non-PDF special ignored!
+Non-PDF special ignored!
 
 
-{C:/Users/Bill/AppData/Local/MiKTeX/2.9/pdftex/config/pdftex.map} <C:/Users/Bil
-l/Documents/GitHub/drttor/doc/figures/logo.png (PNG copy)>] (C:\Users\Bill\Docu
-ments\GitHub\drttor\doc\template.toc)
+{C:/Users/duranda1/AppData/Local/MiKTeX/2.9/pdftex/config/pdftex.map} <C:/Users
+/duranda1/Documents/GitHub/drttor/doc/figures/logo.png (PNG copy)>] (C:\Users\d
+uranda1\Documents\GitHub\drttor\doc\template.toc)
 \tf@toc=\write5
 pdfTeX warning (ext4): destination with the same identifier (name{page.i}) has 
 been already used, duplicate ignored
@@ -859,34 +858,29 @@ Underfull \hbox (badness 10000) in paragraph at lines 137--138
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 143--144
+Underfull \hbox (badness 10000) in paragraph at lines 145--146
 
  []
 
-[1] <figures/schema.jpg, id=106, 503.8825pt x 392.46625pt>
+[1] <figures/schema.jpg, id=107, 503.8825pt x 392.46625pt>
 File: figures/schema.jpg Graphic file (type jpg)
 
 <use figures/schema.jpg>
-Package pdftex.def Info: figures/schema.jpg used on input line 166.
+Package pdftex.def Info: figures/schema.jpg used on input line 168.
 (pdftex.def)             Requested size: 251.94063pt x 196.23264pt.
 
-Overfull \hbox (2.28807pt too wide) in paragraph at lines 180--197
+Overfull \hbox (2.28807pt too wide) in paragraph at lines 182--199
  [] 
  []
 
-<figures/rtorrent.png, id=108, 276.6586pt x 291.33844pt>
+<figures/rtorrent.png, id=109, 276.6586pt x 291.33844pt>
 File: figures/rtorrent.png Graphic file (type png)
 
 <use figures/rtorrent.png>
-Package pdftex.def Info: figures/rtorrent.png used on input line 205.
+Package pdftex.def Info: figures/rtorrent.png used on input line 207.
 (pdftex.def)             Requested size: 193.65968pt x 203.93552pt.
- [2 <C:/Users/Bill/Documents/GitHub/drttor/doc/figures/schema.jpg>]
-Underfull \hbox (badness 10000) in paragraph at lines 215--216
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 221--222
+ [2 <C:/Users/duranda1/Documents/GitHub/drttor/doc/figures/schema.jpg>]
+Underfull \hbox (badness 10000) in paragraph at lines 217--218
 
  []
 
@@ -895,67 +889,79 @@ Underfull \hbox (badness 10000) in paragraph at lines 223--224
 
  []
 
-[3 <C:/Users/Bill/Documents/GitHub/drttor/doc/figures/rtorrent.png>]
-Underfull \hbox (badness 10000) in paragraph at lines 238--239
+
+Underfull \hbox (badness 10000) in paragraph at lines 225--226
 
  []
 
-<figures/works.png, id=122, 1081.03876pt x 1417.295pt>
+[3 <C:/Users/duranda1/Documents/GitHub/drttor/doc/figures/rtorrent.png>]
+Underfull \hbox (badness 10000) in paragraph at lines 240--241
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 244--245
+
+ []
+
+<figures/works.png, id=124, 1081.03876pt x 1417.295pt>
 File: figures/works.png Graphic file (type png)
  <use figures/works.png>
-Package pdftex.def Info: figures/works.png used on input line 247.
-(pdftex.def)             Requested size: 270.25902pt x 354.32288pt.
+Package pdftex.def Info: figures/works.png used on input line 249.
+(pdftex.def)             Requested size: 216.20392pt x 283.45398pt.
 
-Underfull \hbox (badness 10000) in paragraph at lines 253--254
-
- []
-
-[4 <C:/Users/Bill/Documents/GitHub/drttor/doc/figures/works.png>]
 Underfull \hbox (badness 10000) in paragraph at lines 255--256
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 261--262
+Underfull \hbox (badness 10000) in paragraph at lines 257--258
 
  []
 
-<figures/graph1.png, id=137, 827.09pt x 338.26375pt>
+[4 <C:/Users/duranda1/Documents/GitHub/drttor/doc/figures/works.png>]
+Underfull \hbox (badness 10000) in paragraph at lines 259--260
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 263--264
+
+ []
+
+<figures/graph1.png, id=138, 827.09pt x 338.26375pt>
 File: figures/graph1.png Graphic file (type png)
  <use figures/graph1.png>
-Package pdftex.def Info: figures/graph1.png used on input line 268.
+Package pdftex.def Info: figures/graph1.png used on input line 270.
 (pdftex.def)             Requested size: 459.02776pt x 187.73343pt.
 
-<figures/graph2.png, id=139, 482.80376pt x 289.08pt>
+<figures/graph2.png, id=140, 482.80376pt x 289.08pt>
 File: figures/graph2.png Graphic file (type png)
  <use figures/graph2.png>
-Package pdftex.def Info: figures/graph2.png used on input line 279.
+Package pdftex.def Info: figures/graph2.png used on input line 281.
 (pdftex.def)             Requested size: 337.96033pt x 202.35461pt.
 
-[5 <C:/Users/Bill/Documents/GitHub/drttor/doc/figures/graph1.png (PNG copy)>]
-<figures/graph3.png, id=149, 482.80376pt x 289.08pt>
+[5 <C:/Users/duranda1/Documents/GitHub/drttor/doc/figures/graph1.png (PNG copy)
+>] <figures/graph3.png, id=150, 482.80376pt x 289.08pt>
 File: figures/graph3.png Graphic file (type png)
- <use figures/graph3.png>
-Package pdftex.def Info: figures/graph3.png used on input line 290.
+
+<use figures/graph3.png>
+Package pdftex.def Info: figures/graph3.png used on input line 292.
 (pdftex.def)             Requested size: 337.96033pt x 202.35461pt.
 
-Underfull \hbox (badness 10000) in paragraph at lines 299--300
+Underfull \hbox (badness 10000) in paragraph at lines 301--302
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 302--303
+Underfull \hbox (badness 10000) in paragraph at lines 304--305
 
  []
 
-[6 <C:/Users/Bill/Documents/GitHub/drttor/doc/figures/graph2.png (PNG copy)> <C
-:/Users/Bill/Documents/GitHub/drttor/doc/figures/graph3.png (PNG copy)>]
-Underfull \hbox (badness 10000) in paragraph at lines 308--309
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 311--312
+[6 <C:/Users/duranda1/Documents/GitHub/drttor/doc/figures/graph2.png (PNG copy)
+> <C:/Users/duranda1/Documents/GitHub/drttor/doc/figures/graph3.png (PNG copy)>
+]
+Underfull \hbox (badness 10000) in paragraph at lines 310--311
 
  []
 
@@ -965,7 +971,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 313--314
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 320--321
+Underfull \hbox (badness 10000) in paragraph at lines 315--316
 
  []
 
@@ -975,36 +981,41 @@ Underfull \hbox (badness 10000) in paragraph at lines 322--323
  []
 
 
+Underfull \hbox (badness 10000) in paragraph at lines 324--325
+
+ []
+
+
 Package caption Warning: Unused \captionsetup[lstlisting] on input line 35.
 See the caption package documentation for explanation.
 
 \tf@thm=\write6
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 328.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 330.
 [7]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 328.
- (C:\Users\Bill\Documents\GitHub\drttor\doc\template.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 328.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 328.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 330.
+ (C:\Users\duranda1\Documents\GitHub\drttor\doc\template.aux)
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 330.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 330.
 Package rerunfilecheck Info: File `template.out' has not changed.
-(rerunfilecheck)             Checksum: 57E9A3EFC35E152C470C0D574C06F492;786.
+(rerunfilecheck)             Checksum: 24862549D081EA88BBF04EFDE0DF1950;798.
 
 
 LaTeX Warning: There were multiply-defined labels.
 
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 328.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 330.
  )
 (\end occurred inside a group at level 1)
 
 ### simple group (level 1) entered at line 79 ({)
 ### bottom level 
 Here is how much of TeX's memory you used:
- 13847 strings out of 493921
- 209565 string characters out of 3144878
- 361749 words of memory out of 3000000
- 16845 multiletter control sequences out of 15000+200000
+ 13869 strings out of 493921
+ 210232 string characters out of 3144868
+ 362771 words of memory out of 3000000
+ 16867 multiletter control sequences out of 15000+200000
  16110 words of font info for 62 fonts, out of 3000000 for 9000
  841 hyphenation exceptions out of 8191
- 42i,11n,75p,918b,626s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 42i,11n,75p,918b,607s stack positions out of 5000i,500n,10000p,200000b,50000s
 pdfTeX warning (dest): name{Hfootnote.1} has been referenced bu
 t does not exist, replaced by a fixed one
 
@@ -1021,9 +1032,9 @@ fonts/type1/public/amsfonts/cm/cmr9.pfb><C:/Program Files (x86)/MiKTeX 2.9/font
 s/type1/public/amsfonts/cm/cmsy10.pfb><C:/Program Files (x86)/MiKTeX 2.9/fonts/
 type1/public/amsfonts/cm/cmsy9.pfb><C:/Program Files (x86)/MiKTeX 2.9/fonts/typ
 e1/urw/courier/ucrr8a.pfb>
-Output written on template.pdf (9 pages, 444560 bytes).
+Output written on template.pdf (9 pages, 424669 bytes).
 PDF statistics:
- 213 PDF objects out of 1000 (max. 8388607)
+ 214 PDF objects out of 1000 (max. 8388607)
  39 named destinations out of 1000 (max. 500000)
  140 words of extra memory for PDF output out of 10000 (max. 10000000)
 

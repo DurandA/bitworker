@@ -7,7 +7,7 @@
 \contentsline {section}{\numberline {4}Implementation}{3}{section.4}
 \contentsline {subsection}{\numberline {4.1}Rainbow tables generation}{3}{subsection.4.1}
 \contentsline {subsection}{\numberline {4.2}Piece selection and validation}{3}{subsection.4.2}
-\contentsline {subsection}{\numberline {4.3}Torrent client}{4}{subsection.4.3}
+\contentsline {subsection}{\numberline {4.3}Java client implementation}{4}{subsection.4.3}
 \contentsline {section}{\numberline {5}Experiments and results}{5}{section.5}
 \contentsline {section}{\numberline {6}Drawbacks}{6}{section.6}
 \contentsline {section}{\numberline {7}Improvements}{7}{section.7}

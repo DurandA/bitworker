@@ -95,7 +95,7 @@
 % Title page.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\title{BitTorrent distributed generation of rainbow tables}
+\title{Distributed generation of rainbow tables using a P2P network}
 \course{Advanced Networking and Future Internet}
 
 \author{Arnaud Durand, Mikael Gasparian, Thomas Rouvinez}
@@ -124,7 +124,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{abstract}
-In this paper, we discuss the possibility to use the BitTorrent protocol as a way to distribute a workload to be processed by multiple nodes. We create our own implementation and use the rainbow tables generation process as a test application. We present our results, the torrent library we chose to adapt as well as the modifications we operated on it.
+In this paper, we discuss the possibility to use a P2P protocol (specifically BitTorrent) as a way to distribute a workload to be processed by multiple nodes. We create our own implementation and use the rainbow tables generation process as a test application. We present our results, the torrent library we chose to adapt as well as the modifications we operated on it.
 \end{abstract}
 \vspace{2mm}
 
@@ -137,6 +137,8 @@ Following this spirit we can consider distributed computing as a solution that c
 BitTorrent is often considered in distribued computing, but only as a mean to store large amounts of data. Our goal for this project is to actively use the BitTorrent protocol to transform each peer into a computing node that would make the pieces it computed available to other nodes for download. An application requiring a significant amount of processing power and that can easily be split is rainbow tables generation, which we will use as a proof of concept application.\\
 
 In this report, we will explore what are rainbow tables and how they can be generated on multiple machines. We will also present the modifications we operated on the existing BitTorrent protocol to allow us to gather computed data from the nodes. Finally, we will present the results of our implementation.
+
+Please note that another project on distributed rainbow table exists : distrrtgen (\url{http://boinc.freerainbowtables.com/distrrtgen/}). This project is based on BOINC, a middleware system for grid computing. Unlike this project which relies on P2P, distrrtgen uses client-server model.
 
 \section{Tools and libraries}
 
@@ -208,7 +210,7 @@ In addition to this, pieces hashes were removed due to the fact that they are no
 \end{figure}
 \vspace{2mm}
 
-The complete specification is available on project wiki : \url{http://github.com/DurandA/drttor/wiki/Rttorrent-file-specification}
+The complete specification is available on project wiki : \url{http://github.com/DurandA/drttor/wiki/Rtorrent-file-specification}
 
 \section{Implementation}
 
@@ -218,7 +220,7 @@ Complete source code is available here : \url{http://github.com/DurandA/drttor/}
 
 \subsection{Rainbow tables generation}
 
-Each time a piece is unavailable for download among all the connected peers, the RTTorrent starts generating one. We had to implement a new thread for the generation aside the regular download threads. If a piece is missing, we randomly select one of the remaining pieces (see chapter 4.3) to download and start generating the related rainbow table.\\
+Each time a piece is unavailable for download among all the connected peers, the RTTorrent starts generating one (see chapter 4.3).\\
 
 To generate a piece, we use the RainbowCrack Project rtgen that we can call from a dedicated thread on any client node. The piece to compute is selected at random from the array of unavailable pieces. Then we provide RTGen with the information on the hash algorithm, charset, plain text minimum and maximum length and the chain length, all previously stored in the .torrent file.\\
 
@@ -237,24 +239,24 @@ In a regular Torrent, the selection of the next piece to download is made upon a
 
 This project being a proof of concept, we chose strategy number 2 for its ease of implementation compared to its performances. The best solution would be strategy number 3 though for optimal performances and robustness.\\
 
-\subsection{Torrent client}
+\subsection{Java client implementation}
 
-With all the previously mentioned modifications brought to the code, the regular torrent client could not work anymore without adaptations :
+For this project we had to modify the library workflow so that instead of waiting for pieces that are unavailable, we start generating them as soon as the torrent is initialized via a dedicated thread :\\
 
 \vspace{2mm}
 \begin{figure}[H]
   \centering
-    \includegraphics[scale=0.25]{works.png}
+    \includegraphics[scale=0.20]{works.png}
     \caption{Client workflow}
     \label{works}
 \end{figure}
 \vspace{2mm}
 
-In the original Turn's library, the client starts by initializing a "ShareTorrent" object from a torrent meta-info source (either a file or a byte array, see com.turn.ttorrent.SharedTorrent). Then, it instantiates the Client object with this SharedTorrent and downloads the torrent and continues seeding for the given amount of time after the download completes.\\
+In the original Turn's library, the client starts by initializing a torrent \texttt{T<SharedTorrent>} object from a torrent meta-info source (either a file or a byte array, see com.turn.ttorrent.SharedTorrent). Then, it instantiates the \texttt{Client} object from the associated \texttt{SharedTorrent}.\\
 
-For this project we had to modify the download process so that instead of waiting for a piece that is unavailable, we start generating it via a callable execution. \\
+Client object contains the main logic of the application. Constructor starts threads for handling connection with other peers (service \texttt{T<ConnectionHandler>}) and with tracker (announce \texttt{T<Announce>}. It was modified to start generator \texttt{T<RTGenerator>} after the who mentioned services.\\
 
-TO COMPLETE
+\texttt{RTGenerator} class was not part of the original library and generates pieces using random piece from \texttt{getUnavailablePieces()} available from the \texttt{SharedTorrent} instance. The generator is executed until there is no more pieces unavailable on the Torrent swarm. Generating pieces is done with external process call (equivalent to exec) to rtgen using parameters relative to the specific piece. After having generated a piece, the generator writes the piece on the associated chunk of the rainbow table file and then calls \texttt{firePieceCompleted()} to notice observer(s) (which is the client) that a piece generation is completed.\\
 
 \section{Experiments and results}
 

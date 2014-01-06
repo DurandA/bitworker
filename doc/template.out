@@ -6,7 +6,7 @@
 \BOOKMARK [1][-]{section.4}{Implementation}{}% 6
 \BOOKMARK [2][-]{subsection.4.1}{Rainbow tables generation}{section.4}% 7
 \BOOKMARK [2][-]{subsection.4.2}{Piece selection and validation}{section.4}% 8
-\BOOKMARK [2][-]{subsection.4.3}{Torrent client}{section.4}% 9
+\BOOKMARK [2][-]{subsection.4.3}{Java client implementation}{section.4}% 9
 \BOOKMARK [1][-]{section.5}{Experiments and results}{}% 10
 \BOOKMARK [1][-]{section.6}{Drawbacks}{}% 11
 \BOOKMARK [1][-]{section.7}{Improvements}{}% 12
