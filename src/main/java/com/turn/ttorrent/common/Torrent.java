@@ -15,6 +15,10 @@
  */
 package com.turn.ttorrent.common;
 
+import com.turn.ttorrent.bcodec.BDecoder;
+import com.turn.ttorrent.bcodec.BEValue;
+import com.turn.ttorrent.bcodec.BEncoder;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -49,10 +53,6 @@ import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.turn.ttorrent.bcodec.BDecoder;
-import com.turn.ttorrent.bcodec.BEValue;
-import com.turn.ttorrent.bcodec.BEncoder;
-
 /**
  * A torrent file tracked by the controller's BitTorrent tracker.
  *
@@ -72,25 +72,29 @@ import com.turn.ttorrent.bcodec.BEncoder;
  */
 public class Torrent {
 
-	private static final Logger logger = LoggerFactory.getLogger(Torrent.class);
+	private static final Logger logger =
+		LoggerFactory.getLogger(Torrent.class);
 
 	/** Torrent file piece length (in bytes), we use 512 kB. */
 	private static final int PIECE_LENGTH = 512 * 1024;
+
 	public static final int PIECE_HASH_SIZE = 20;
 
 	/** The query parameters encoding when parsing byte strings. */
 	public static final String BYTE_ENCODING = "ISO-8859-1";
 
 	/**
+	 *
 	 * @author dgiffin
 	 * @author mpetazzoni
-	 * #author Thomas Rouvinez
+	 * @author Thomas Rouvinez
+	 * @author Arnaud Durand
 	 */
-	public static class TorrentFile implements RTTorrentFileDescriptor {
+	public static class TorrentFile implements TorrentFileDescriptor {
 
 		public final File file;
 		public final long size;
-		public final int tableIndex;
+		public final int fileIndex;
 
 		/*public TorrentFile(File file, long size) {
 			this.file = file;
@@ -100,10 +104,10 @@ public class Torrent {
 		/**
 		 * @author Arnaud Durand
 		 */
-		public TorrentFile(File file, long size, int tableIndex) {
+		public TorrentFile(File file, long size, int fileIndex) {
 			this.file = file;
 			this.size = size;
-			this.tableIndex = tableIndex;
+			this.fileIndex = fileIndex;
 		}
 
 		@Override
@@ -117,8 +121,8 @@ public class Torrent {
 		}
 
 		@Override
-		public int getTableIndex() {
-			return this.tableIndex;
+		public int getFileIndex() {
+			return this.fileIndex;
 		}
 	}
 
@@ -136,18 +140,12 @@ public class Torrent {
 	private final String comment;
 	private final String createdBy;
 	private final String name;
+	private final String command;
+	private final int pieceLength;
 	private final long size;
 	protected final List<TorrentFile> files;
+
 	private final boolean seeder;
-	
-	// RTTorrent specific
-	private int chainLength;
-	private int plaintextLenMin;
-	private int plaintextLenMax;
-	private long pieceLength;
-	private String charset;
-	private String hashAlgorithm;
-	private URI announce;
 
 	/**
 	 * Create a new torrent from meta-info binary data.
@@ -317,7 +315,8 @@ public class Torrent {
 
 	/**
 	 * @author Thomas Rouvinez
-	 * 
+	 * @author Arnaud Durand
+	 *
 	 * Create a new torrent from meta-info binary data.
 	 *
 	 * Parses the meta-info data (which should be B-encoded as described in the
@@ -329,12 +328,10 @@ public class Torrent {
 	 * encoded and hashed back to create the torrent's SHA-1 hash.
 	 */
 	public Torrent(byte[] torrent, boolean seeder) throws IOException {
-		// Variables.
 		this.encoded = torrent;
 		this.seeder = seeder;
 		this.decoded = BDecoder.bdecode(new ByteArrayInputStream(this.encoded)).getMap();
 
-		// Get information.
 		this.decoded_info = this.decoded.get("info").getMap();
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		BEncoder.bencode(this.decoded_info, baos);
@@ -361,7 +358,6 @@ public class Torrent {
 			throw new IOException(use);
 		}
 		
-		// Decoding informations.
 		this.creationDate = this.decoded.containsKey("creation date")
 			? new Date(this.decoded.get("creation date").getLong() * 1000)
 			: null;
@@ -374,35 +370,17 @@ public class Torrent {
 			? this.decoded.get("created by").getString()
 			: null;
 			
-		this.chainLength = this.decoded.containsKey("chain len")
-			? this.decoded.get("chain len").getInt()
-			: 0;
-			
-		this.plaintextLenMin = this.decoded.containsKey("plaintext min")
-			? this.decoded.get("plaintext min").getInt()
-			: 0;
-			
-		this.plaintextLenMax = this.decoded.containsKey("plaintext max")
-			? this.decoded.get("plaintext max").getInt()
-			: 0;
-			
-		this.charset = this.decoded.containsKey("charset")
-			? this.decoded.get("charset").getString()
+		this.command = this.decoded.containsKey("command")
+			? this.decoded.get("command").getString()
 			: null;
 			
-		this.hashAlgorithm = this.decoded.containsKey("hash algorithm")
-					? this.decoded.get("hash algorithm").getString()
-					: null;
-			
-		this.pieceLength = this.decoded.containsKey("hash algorithm")
-				? this.decoded_info.get("piece length").getInt()
-				:0;
-			
 		this.name = this.decoded_info.get("name").getString();
+		this.pieceLength = this.decoded_info.get("piece length").getInt();
 		this.files = new LinkedList<TorrentFile>();
 		
 		// Parse multi-file torrent file information structure.
 		if (this.decoded_info.containsKey("files")) {
+			int fileIndex=0;
 			for (BEValue file : this.decoded_info.get("files").getList()) {
 				Map<String, BEValue> fileInfo = file.getMap();
 				StringBuilder localPath = new StringBuilder();
@@ -413,7 +391,8 @@ public class Torrent {
 				
 				this.files.add(new TorrentFile(
 					new File(this.name, localPath.toString()),
-					fileInfo.get("length").getLong(), fileInfo.get("table index").getInt()));
+					fileInfo.get("length").getLong(), fileIndex));
+				fileIndex++;
 			}
 		}
 		
@@ -477,12 +456,28 @@ public class Torrent {
 	
 	/**
 	 * @author Arnaud Durand
+	 * Get the command from this torrent.
+	 */
+	public String getCommand() {
+		return command;
+	}
+	
+	/**
+	 * @author Arnaud Durand
+	 * Get the file piece length from this torrent.
+	 */
+	public long getPieceLength() {
+		return pieceLength;
+	}
+	
+	/**
+	 * @author Arnaud Durand
 	 * Get the file descriptors from this torrent.
 	 *
 	 * @return The list of the descriptors of all the files described in
 	 * this torrent.
 	 */
-	public List<? extends RTTorrentFileDescriptor> getFileDescriptors() {
+	public List<? extends TorrentFileDescriptor> getFileDescriptors() {
 		return files;
 	}
 
@@ -968,65 +963,5 @@ public class Torrent {
 		} catch (ExecutionException ee) {
 			throw new IOException("Error while hashing the torrent data!", ee);
 		}
-	}
-	
-	public int getChainLength() {
-		return chainLength;
-	}
-
-	public void setChainLength(int chainLength) {
-		this.chainLength = chainLength;
-	}
-
-	public int getPlaintextLenMin() {
-		return plaintextLenMin;
-	}
-
-	public void setPlaintextLenMin(int plaintextLenMin) {
-		this.plaintextLenMin = plaintextLenMin;
-	}
-
-	public int getPlaintextLenMax() {
-		return plaintextLenMax;
-	}
-
-	public void setPlaintextLenMax(int plaintextLenMax) {
-		this.plaintextLenMax = plaintextLenMax;
-	}
-
-	public long getPieceLength() {
-		return pieceLength;
-	}
-
-	public void setPieceLength(long pieceLength) {
-		this.pieceLength = pieceLength;
-	}
-
-	public String getCharset() {
-		return charset;
-	}
-
-	public void setCharset(String charset) {
-		this.charset = charset;
-	}
-
-	public String getHashAlgorithm() {
-		return hashAlgorithm;
-	}
-
-	public void setHashAlgorithm(String hashAlgorithm) {
-		this.hashAlgorithm = hashAlgorithm;
-	}
-
-	public URI getAnnounce() {
-		return announce;
-	}
-
-	public void setAnnounce(URI announce) {
-		this.announce = announce;
-	}
-
-	public Date getCreationDate() {
-		return creationDate;
 	}
 }

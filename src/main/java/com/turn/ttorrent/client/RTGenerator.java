@@ -3,17 +3,21 @@ package com.turn.ttorrent.client;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.ProcessBuilder.Redirect;
 import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.BitSet;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 
-import com.turn.ttorrent.common.RTTorrentFileDescriptor;
+import org.apache.commons.io.IOUtils;
+
+import com.turn.ttorrent.common.TorrentFileDescriptor;
 
 /**
  * @author Arnaud Durand
@@ -21,28 +25,11 @@ import com.turn.ttorrent.common.RTTorrentFileDescriptor;
  */
 public class RTGenerator implements Runnable {
 
-	public static final String rtgenPath = "C:\\rainbowcrack-1.5-win64\\";
 	private static Random rand = new Random();
-
-	private String hashAlgorithm;
-	private String charset;
-	private int plaintextLenMin;
-	private int plaintextLenMax;
-	/*
-	 * This is the rainbow chain length. Longer rainbow chain stores more
-	 * plaintexts and requires longer time to generate.
-	 */
-	private int chainLength;
-	/*
-	 * Number of rainbow chains to generate. Rainbow table is simply an array of
-	 * rainbow chains. Size of each rainbow chain is 16 bytes.
-	 */
-	long chainNum;
-
+	
 	private SharedTorrent torrent;
 
 	private Set<RTGenerationListener> listeners;
-	private ExecutorService executor;
 	private Thread thread;
 
 	public RTGenerator(SharedTorrent torrent) {
@@ -50,7 +37,6 @@ public class RTGenerator implements Runnable {
 
 		this.listeners = new HashSet<RTGenerationListener>();
 		this.thread = null;
-
 	}
 
 	public void start() {
@@ -60,86 +46,46 @@ public class RTGenerator implements Runnable {
 			this.thread.start();
 		}
 	}
-
-	/**
-	 * @author Arnaud Durand
-	 * @author Mikael Gasparian
-	 * 
-	 */
+	
 	public Piece generatePiece(int pieceIndex) throws InterruptedException,
 			IOException, Exception {
-		RTTorrentFileDescriptor descriptor = null;
-
+		TorrentFileDescriptor descriptor = null;
+		
 		long offset = 0L;
-		List<? extends RTTorrentFileDescriptor> descriptors = torrent
+		List<? extends TorrentFileDescriptor> descriptors = torrent
 				.getFileDescriptors();
-
-		for (RTTorrentFileDescriptor d : descriptors) {
+		for (TorrentFileDescriptor d : descriptors) {
 			if (pieceIndex * torrent.getPieceLength() < offset) {
 				break;
 			}
 			descriptor=d;
 			offset += d.getLength();
 		}
-
-		/*
-		 * The table_index parameter selects the reduction function. Rainbow
-		 * table with different table_index parameter uses different reduction
-		 * function.
-		 */
-		int tableIndex = descriptor.getTableIndex();
-
-		/*
-		 * To store a large rainbow table in many smaller files, use different
-		 * number in this parameter for each part and keep all other parameters
-		 * identical.
-		 */
 		int partIndex = (int) (offset!=0 ? pieceIndex % offset : offset);
+		
+		ProcessBuilder pb =
+				new ProcessBuilder("myCommand", "myArg1", "myArg2");
+		Map<String, String> env = pb.environment();
+		env.put("PIECE_IDX", Integer.toString(pieceIndex));
+		env.put("FILE_IDX", Integer.toString(descriptor.getFileIndex()));
+		env.put("PART_IDX", Integer.toString(partIndex));
+		
+		Process pr = pb.start();
 
-		Runtime rt = Runtime.getRuntime();
-		Process pr;
-
-		pr = rt.exec(new String[] { rtgenPath + "rtgen.exe", hashAlgorithm,
-				charset, Integer.toString(plaintextLenMin),
-				Integer.toString(plaintextLenMax),
-				Integer.toString(tableIndex), Integer.toString(chainLength),
-				Long.toString(chainNum), Integer.toString(partIndex) });
+		ByteBuffer generatdPieceAsByteBuffer=ByteBuffer
+				.wrap(IOUtils.toByteArray(pr.getInputStream()));
+		
 		int exitVal;
 		if ((exitVal = pr.waitFor()) != 0)
-			throw new Exception("rtgen exited with error code " + exitVal);
-        BufferedReader input = new BufferedReader(new InputStreamReader(pr.getInputStream()));
-        String line=null;
-        while((line=input.readLine()) != null) {
-            System.out.println(line);
-        }
-        
-		/*pr = rt.exec(new String[] { rtgenPath + "rtsort.exe",
-				descriptor.getPath() });
-		if ((exitVal = pr.waitFor()) != 0)
-			throw new Exception("rtsort exited with error code " + exitVal);
-		
-		while((line=input.readLine()) != null) {
-            System.out.println(line);
-        }*/
+			throw new Exception("command exited with error code " + exitVal);
 		
 		Piece p = torrent.getPiece(pieceIndex);
-		String rtFilename=hashAlgorithm+"_"+charset+"#"+plaintextLenMin+"-"+plaintextLenMax+"_"+tableIndex+"_"+chainLength+"x"+chainNum+"_"+partIndex+".rt";
-
-		System.out.println(Paths.get(rtFilename));
-		ByteBuffer generatdFileAsByteBuffer=ByteBuffer.wrap((Files.readAllBytes(Paths.get(rtFilename))));
-		p.record(generatdFileAsByteBuffer, 0);
+		p.record(generatdPieceAsByteBuffer, 0);
 
 		return p;
 	}
 
 	public void run() {
-		hashAlgorithm = torrent.getHashAlgorithm();
-		charset = torrent.getCharset();
-		plaintextLenMin = torrent.getPlaintextLenMin();
-		plaintextLenMax = torrent.getPlaintextLenMax();
-		chainLength = torrent.getChainLength();
-		chainNum = torrent.getPieceLength() / 16;
-
 		BitSet unavailablePieces = torrent.getUnavailablePieces();
 
 		while (!unavailablePieces.isEmpty()) {
