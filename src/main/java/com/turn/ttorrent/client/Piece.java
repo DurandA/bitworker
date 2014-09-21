@@ -298,12 +298,12 @@ public class Piece implements Comparable<Piece> {
 		this.data.put(block);
 		block.position(pos);
 
-		if (block.remaining() + offset == this.length) {
+		/*if (block.remaining() + offset == this.length) {*/
 			this.data.rewind();
 			logger.trace("Recording {}...", this);
 			this.bucket.write(this.data, this.offset);
 			this.data = null;
-		}
+		/*}*/
 	}
 
 	/**

@@ -12,7 +12,7 @@ import com.turn.ttorrent.client.peer.SharingPeer;
  * @author Arnaud Durand
  */
 
-public interface RTGenerationListener extends EventListener {
+public interface RWGenerationListener extends EventListener {
 	
 	public void handlePieceGenerationCompleted(Piece piece) throws IOException;
 
