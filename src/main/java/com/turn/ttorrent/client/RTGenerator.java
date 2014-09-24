@@ -3,6 +3,7 @@ package com.turn.ttorrent.client;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -13,6 +14,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 
+import com.turn.ttorrent.cli.ClientMain;
 import com.turn.ttorrent.common.RTTorrentFileDescriptor;
 
 /**
@@ -95,7 +97,7 @@ public class RTGenerator implements Runnable {
 		 * identical.
 		 */
 		int partIndex = (int) (offset!=0 ? pieceIndex % offset : offset);
-
+/*
 		Runtime rt = Runtime.getRuntime();
 		Process pr;
 
@@ -122,13 +124,33 @@ public class RTGenerator implements Runnable {
             System.out.println(line);
         }*/
 		
+
+	thread.sleep(2000);
+	
+		String rtFilename=ClientMain.InterfaceName+"_"+hashAlgorithm+"_"+charset+"#"+plaintextLenMin+"-"+plaintextLenMax+"_"+tableIndex+"_"+chainLength+"x"+chainNum+"_"+partIndex+".rt";
+
+
+			
 		Piece p = torrent.getPiece(pieceIndex);
-		String rtFilename=hashAlgorithm+"_"+charset+"#"+plaintextLenMin+"-"+plaintextLenMax+"_"+tableIndex+"_"+chainLength+"x"+chainNum+"_"+partIndex+".rt";
+		
+		
+		Random generator = new Random();
+		int i = generator.nextInt(3)+1;
 
-		System.out.println(Paths.get(rtFilename));
+		
+		
+		
+		RandomAccessFile raf=new RandomAccessFile(rtFilename, "rw");
+		raf.setLength(1048576*i);
+		//p.setSize(1048576*1);
+		
+		
+         raf.writeBytes("This will complete the Demo "+pieceIndex);
+         raf.close();	
+         
+        System.out.println(Paths.get(rtFilename));
 		ByteBuffer generatdFileAsByteBuffer=ByteBuffer.wrap((Files.readAllBytes(Paths.get(rtFilename))));
-		p.record(generatdFileAsByteBuffer, 0);
-
+		p.record2(generatdFileAsByteBuffer, 0,true);
 		return p;
 	}
 

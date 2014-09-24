@@ -428,7 +428,8 @@ public class Client extends Observable implements Runnable,
 	 * Close torrent and set final client state before signing off.
 	 */
 	private void finish() {
-		this.torrent.close();
+		//MMM delete
+		//this.torrent.close();
 
 		// Determine final state
 		if (this.torrent.isFinished()) {
@@ -705,11 +706,13 @@ public class Client extends Observable implements Runnable,
 			//     something).
 			SharingPeer match = this.getOrCreatePeer(peer);
 			if (this.isSeed()) {
+				
 				continue;
 			}
 
 			synchronized (match) {
 				if (!match.isConnected()) {
+	
 					this.service.connect(match);
 				}
 			}
@@ -836,6 +839,7 @@ public class Client extends Observable implements Runnable,
 	@Override
 	public void handlePieceCompleted(SharingPeer peer, Piece piece)
 		throws IOException {
+		System.out.println("handlePieceCompleted");
 		synchronized (this.torrent) {
 			if (piece.isValid()) {
 				// Make sure the piece is marked as completed in the torrent
@@ -852,10 +856,13 @@ public class Client extends Observable implements Runnable,
 						this.torrent.getCompletedPieces().cardinality(),
 						this.torrent.getPieceCount()
 					});
+			
+
 
 				// Send a HAVE message to all connected peers
 				PeerMessage have = PeerMessage.HaveMessage.craft(piece.getIndex());
 				for (SharingPeer remote : this.connected.values()) {
+					System.out.println("AAAAAAAAAAAAAAAAAAAAAAA");
 					remote.send(have);
 				}
 
@@ -874,6 +881,7 @@ public class Client extends Observable implements Runnable,
 				// Cancel all remaining outstanding requests
 				for (SharingPeer remote : this.connected.values()) {
 					if (remote.isDownloading()) {
+						System.out.println("LLLLLLLLLLLLLL");
 						int requests = remote.cancelPendingRequests().size();
 						logger.info("Cancelled {} remaining pending requests on {}.",
 							requests, remote);

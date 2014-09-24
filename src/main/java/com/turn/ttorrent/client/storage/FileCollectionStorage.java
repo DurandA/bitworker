@@ -23,6 +23,8 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.turn.ttorrent.client.Piece;
+
 
 /**
  * Multi-file torrent byte storage.
@@ -68,11 +70,13 @@ public class FileCollectionStorage implements TorrentByteStorage {
 	}
 
 	@Override
-	public int read(ByteBuffer buffer, long offset) throws IOException {
+	public int read(ByteBuffer buffer, long offset,Piece p) throws IOException {
 		int requested = buffer.remaining();
 		int bytes = 0;
 
-		for (FileOffset fo : this.select(offset, requested)) {
+		
+		//MM
+		/*for (FileOffset fo : this.select(offset, requested)) {
 			// TODO: remove cast to int when large ByteBuffer support is
 			// implemented in Java.
 			buffer.limit((int)(bytes + fo.length));
@@ -81,25 +85,29 @@ public class FileCollectionStorage implements TorrentByteStorage {
 
 		if (bytes < requested) {
 			throw new IOException("Storage collection read underrun!");
-		}
-
+		}*/
+		bytes=this.files.get(p.index).read(buffer, offset, p);
 		return bytes;
 	}
 
 	@Override
-	public int write(ByteBuffer buffer, long offset) throws IOException {
+	public int write(ByteBuffer buffer, long offset,Piece p) throws IOException {
 		int requested = buffer.remaining();
 
 		int bytes = 0;
-
-		for (FileOffset fo : this.select(offset, requested)) {
+		this.files.get(p.index).size=p.length ;
+		bytes=this.files.get(p.index).write(buffer, 0,p);
+		
+		//MM
+		/*for (FileOffset fo : this.select(offset, requested)) {
 			buffer.limit(bytes + (int)fo.length);
 			bytes += fo.file.write(buffer, fo.offset);
-		}
+		}*/
+	
 
-		if (bytes < requested) {
+		/*if (bytes < requested) {
 			throw new IOException("Storage collection write underrun!");
-		}
+		}*/
 
 		return bytes;
 	}

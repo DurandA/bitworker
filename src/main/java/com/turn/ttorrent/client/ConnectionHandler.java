@@ -345,7 +345,7 @@ public class ConnectionHandler implements Runnable {
 			throw new IllegalStateException(
 				"Connection handler is not accepting new peers at this time!");
 		}
-
+		
 		this.executor.submit(new ConnectorTask(this, peer));
 	}
 
@@ -477,6 +477,7 @@ public class ConnectionHandler implements Runnable {
 		private ConnectorTask(ConnectionHandler handler, SharingPeer peer) {
 			this.handler = handler;
 			this.peer = peer;
+			
 		}
 
 		@Override
@@ -487,11 +488,15 @@ public class ConnectionHandler implements Runnable {
 
 			try {
 				logger.info("Connecting to {}...", this.peer);
+				
 				channel = SocketChannel.open(address);
+			
 				while (!channel.isConnected()) {
+					
 					Thread.sleep(10);
+				
 				}
-
+				
 				logger.debug("Connected. Sending handshake to {}...", this.peer);
 				channel.configureBlocking(true);
 				int sent = this.handler.sendHandshake(channel);
@@ -507,6 +512,7 @@ public class ConnectionHandler implements Runnable {
 				channel.configureBlocking(false);
 				this.handler.fireNewPeerConnection(channel, hs.getPeerId());
 			} catch (Exception e) {
+				
 				if (channel != null && channel.isConnected()) {
 					IOUtils.closeQuietly(channel);
 				}

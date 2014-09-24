@@ -206,9 +206,14 @@ public class SharedTorrent extends Torrent implements PeerActivityListener {
 			}
 
 			actual.getParentFile().mkdirs();
-			files.add(new FileStorage(actual, offset, file.size));
-			offset += file.size;
+			//MMM delete file.size put zero
+			
+			files.add(new FileStorage(actual, offset, 0));
+			
+			//MMM delete
+			//offset += file.size;
 		}
+		System.out.println("SIZZZZZZZZZZZZZZ"+this.getSize());
 		this.bucket = new FileCollectionStorage(files, this.getSize());
 
 		this.random = new Random(System.currentTimeMillis());
@@ -330,10 +335,9 @@ public class SharedTorrent extends Torrent implements PeerActivityListener {
 		}
 
 		int threads = getHashingThreadsCount();
-		int nPieces = (int) (Math.ceil(
-				(double)this.getSize() / this.pieceLength));
+		int nPieces = 4;
 		int step = 10;
-
+		System.out.println("OOOOOOOOOOOO:"+this.getSize());
 		this.pieces = new Piece[nPieces];
 		this.completedPieces = new BitSet(nPieces);
 		//this.piecesHashes.clear();
@@ -661,7 +665,7 @@ public class SharedTorrent extends Torrent implements PeerActivityListener {
 		interesting.andNot(this.completedPieces);
 		interesting.andNot(this.requestedPieces);
 
-		logger.trace("Peer {} is ready and has {} interesting piece(s).",
+		logger.info("Peer {} is ready and has {} interesting piece(s).",
 			peer, interesting.cardinality());
 
 		// If we didn't find interesting pieces, we need to check if we're in
@@ -705,7 +709,7 @@ public class SharedTorrent extends Torrent implements PeerActivityListener {
 				RAREST_PIECE_JITTER)));
 		this.requestedPieces.set(chosen.getIndex());
 
-		logger.trace("Requesting {} from {}, we now have {} " +
+		logger.info("Requesting {} from {}, we now have {} " +
 				"outstanding request(s): {}",
 			new Object[] {
 				chosen,
@@ -793,7 +797,7 @@ public class SharedTorrent extends Torrent implements PeerActivityListener {
 			this.rarest.add(this.pieces[i]);
 		}
 
-		logger.trace("Peer {} contributes {} piece(s) ({} interesting) " +
+		logger.info("Peer {} contributes {} piece(s) ({} interesting) " +
 			"[completed={}; available={}/{}].",
 			new Object[] {
 				peer,

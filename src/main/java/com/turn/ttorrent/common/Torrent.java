@@ -52,6 +52,7 @@ import org.slf4j.LoggerFactory;
 import com.turn.ttorrent.bcodec.BDecoder;
 import com.turn.ttorrent.bcodec.BEValue;
 import com.turn.ttorrent.bcodec.BEncoder;
+import com.turn.ttorrent.cli.ClientMain;
 
 /**
  * A torrent file tracked by the controller's BitTorrent tracker.
@@ -411,7 +412,7 @@ public class Torrent {
 						.append(pathElement.getString());
 				}
 				
-				this.files.add(new TorrentFile(
+				this.files.add(new TorrentFile(//ClientMain.InterfaceName
 					new File(this.name, localPath.toString()),
 					fileInfo.get("length").getLong(), fileInfo.get("table index").getInt()));
 			}

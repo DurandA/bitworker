@@ -505,7 +505,7 @@ public abstract class PeerMessage {
 			int offset = buffer.getInt();
 			int length = buffer.getInt();
 			return new RequestMessage(buffer, piece,
-					offset, length).validate(torrent);
+					offset, length);//MMM.validate(torrent);
 		}
 
 		public static RequestMessage craft(int piece, int offset, int length) {
@@ -575,8 +575,8 @@ public abstract class PeerMessage {
 			int piece = buffer.getInt();
 			int offset = buffer.getInt();
 			ByteBuffer block = buffer.slice();
-			return new PieceMessage(buffer, piece, offset, block)
-				.validate(torrent);
+			return new PieceMessage(buffer, piece, offset, block);
+				//.validate(torrent);
 		}
 
 		public static PieceMessage craft(int piece, int offset,
