@@ -136,12 +136,12 @@ public class Piece implements Comparable<Piece> {
 	}
 
 	/**
-	 * Returns the size, in bytes, of this piece.
-	 *
-	 * <p>
-	 * All pieces, except the last one, are expected to have the same size.
-	 * </p>
-	 */
+	* Returns the size, in bytes, of this piece.
+	*
+	* <p>
+	* All pieces, except the last one, are expected to have the same size.
+	* </p>
+	*/
 	public long size() {
 		return this.length;
 	}
@@ -154,8 +154,8 @@ public class Piece implements Comparable<Piece> {
 	 * </p>
 	 * @return 
 	 */
-	public  void setSize(int Piecesize) {
-		 this.length=Piecesize;
+	public void setSize(long length) {
+		 this.length = length;
 	}
 
 	/**
@@ -297,7 +297,7 @@ public class Piece implements Comparable<Piece> {
 	 * @param block The ByteBuffer containing the block data.
 	 * @param offset The block offset in this piece.
 	 */
-	public synchronized void record(ByteBuffer block, int offset, boolean isTheEnd)
+	public synchronized void record(ByteBuffer block, int offset, boolean isFinished)
 		throws IOException {
 		if (this.data == null || offset == 0) {
 			// TODO: remove cast to int when large ByteBuffer support is
@@ -305,13 +305,13 @@ public class Piece implements Comparable<Piece> {
 			this.data = ByteBuffer.allocate((int)this.length);
 		}
 	
-		if (!isTheEnd){
+		if (!isFinished){
 			int pos = block.position();
 			this.data.position(offset);
 			this.data.put(block);
 			block.position(pos);
 		} else {
-			this.length=this.data.position();
+			this.length = this.data.position();
 			System.out.println("isTheEnd  is valid="+isValid()+" for piece "+this.index+" the size is "+this.length +" write to offse t"+this.offset+" a data length of "+this.data.capacity());
 			this.data.rewind();
 			logger.trace("Recording {}...", this);
@@ -329,35 +329,27 @@ public class Piece implements Comparable<Piece> {
 		}*/
 	}
 	
-	public synchronized void record2(ByteBuffer block, int offset,boolean isTheEnd)
-			throws IOException {
-			if (this.data == null || offset == 0) {
-				// TODO: remove cast to int when large ByteBuffer support is
-				// implemented in Java.
-				this.data = ByteBuffer.allocate((int)this.length);
-			}
-			
-			int pos = block.position();
-			this.data.position(offset);
-			this.data.put(block);
-			block.position(pos);
-			System.out.println("Mike was here "+this.data.position());
-			this.length=this.data.position();
-			if(isTheEnd){
-				this.data.rewind();
-				logger.trace("Recording {}...", this);
-				this.bucket.write(this.data, this.offset,this);
-				this.data = null;
-				
-			}
-			
-			/*if (block.remaining() + offset == this.length) {
-				this.data.rewind();
-				logger.trace("Recording {}...", this);
-				this.bucket.write(this.data, this.offset);
-				this.data = null;
-			}*/
+	public synchronized void recordLocal(ByteBuffer block, int offset, boolean isFinished)
+		throws IOException {
+		if (this.data == null || offset == 0) {
+			// TODO: remove cast to int when large ByteBuffer support is
+			// implemented in Java.
+			this.data = ByteBuffer.allocate((int)this.length);
 		}
+		
+		int pos = block.position();
+		this.data.position(offset);
+		this.data.put(block);
+		block.position(pos);
+		this.length = this.data.position();
+		if(isFinished){
+			this.data.rewind();
+			logger.trace("Recording {}...", this);
+			this.bucket.write(this.data, this.offset,this);
+			this.data = null;
+			
+		}
+	}
 
 	/**
 	 * Return a human-readable representation of this piece.

@@ -79,6 +79,7 @@ public class RWGenerator implements Runnable {
 		Process pr = pb.start();
 		
 		Piece p = torrent.getPiece(pieceIndex);
+		//p.setSize(1024*1024*1024);
 		logger.info("Generating {} with command {}",
 				new Object[] {p, torrent.getCommand()});
 		
@@ -98,7 +99,7 @@ public class RWGenerator implements Runnable {
 		
 		ByteBuffer generatdPieceAsByteBuffer=ByteBuffer
 				.wrap(IOUtils.toByteArray(pr.getInputStream()));
-		p.record(generatdPieceAsByteBuffer, 0);
+		p.recordLocal(generatdPieceAsByteBuffer, 0, true);
 		
 		BufferedReader bre = new BufferedReader
 				(new InputStreamReader(pr.getErrorStream()));

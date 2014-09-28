@@ -71,7 +71,7 @@ import org.slf4j.LoggerFactory;
  * @author mpetazzoni
  */
 public class Client extends Observable implements Runnable,
-	AnnounceResponseListener, IncomingConnectionListener, PeerActivityListener, RTGenerationListener {
+	AnnounceResponseListener, IncomingConnectionListener, PeerActivityListener, RWGenerationListener {
 
 	private static final Logger logger =
 		LoggerFactory.getLogger(Client.class);
@@ -106,7 +106,7 @@ public class Client extends Observable implements Runnable,
 	private long seed;
 
 	private ConnectionHandler service;
-	private RTGenerator generator;
+	private RWGenerator generator;
 	private Announce announce;
 	private ConcurrentMap<String, SharingPeer> peers;
 	private ConcurrentMap<String, SharingPeer> connected;
@@ -136,7 +136,7 @@ public class Client extends Observable implements Runnable,
 		this.service.register(this);
 		
 		// Initialize the RT generator thread, and register ourselves to it.
-		this.generator = new RTGenerator(this.torrent);
+		this.generator = new RWGenerator(this.torrent);
 		this.generator.register(this);
 
 		this.self = new Peer(
