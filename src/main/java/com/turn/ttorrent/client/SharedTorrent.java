@@ -213,7 +213,7 @@ public class SharedTorrent extends Torrent implements PeerActivityListener {
 			//MMM delete
 			//offset += file.size;
 		}
-		System.out.println("SIZZZZZZZZZZZZZZ"+this.getSize());
+
 		this.bucket = new FileCollectionStorage(files, this.getSize());
 
 		this.random = new Random(System.currentTimeMillis());

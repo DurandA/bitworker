@@ -101,7 +101,6 @@ public class Client extends Observable implements Runnable,
 	private SharedTorrent torrent;
 	private ClientState state;
 	private Peer self;
-
 	private Thread thread;
 	private boolean stop;
 	private long seed;
@@ -706,13 +705,11 @@ public class Client extends Observable implements Runnable,
 			//     something).
 			SharingPeer match = this.getOrCreatePeer(peer);
 			if (this.isSeed()) {
-				
 				continue;
 			}
 
 			synchronized (match) {
 				if (!match.isConnected()) {
-	
 					this.service.connect(match);
 				}
 			}
@@ -857,8 +854,6 @@ public class Client extends Observable implements Runnable,
 						this.torrent.getPieceCount()
 					});
 			
-
-
 				// Send a HAVE message to all connected peers
 				PeerMessage have = PeerMessage.HaveMessage.craft(piece.getIndex());
 				for (SharingPeer remote : this.connected.values()) {

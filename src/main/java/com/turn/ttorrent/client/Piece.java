@@ -257,7 +257,6 @@ public class Piece implements Comparable<Piece> {
 		buffer.limit(bytes >= 0 ? bytes : 0);
 		return buffer;
 	}
-	
 	/**
 	 * Read a piece block from the underlying byte storage.
 	 *
@@ -312,7 +311,6 @@ public class Piece implements Comparable<Piece> {
 		this.data.put(block);
 		block.position(pos);
 		}
-		System.out.println("+++++++++"+this.data.position());
 		
 		
 		if(isTheEnd){
@@ -334,6 +332,7 @@ public class Piece implements Comparable<Piece> {
 			this.data = null;
 		}*/
 	}
+	
 	public synchronized void record2(ByteBuffer block, int offset,boolean isTheEnd)
 			throws IOException {
 			if (this.data == null || offset == 0) {

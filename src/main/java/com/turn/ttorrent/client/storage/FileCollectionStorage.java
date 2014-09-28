@@ -73,8 +73,6 @@ public class FileCollectionStorage implements TorrentByteStorage {
 	public int read(ByteBuffer buffer, long offset,Piece p) throws IOException {
 		int requested = buffer.remaining();
 		int bytes = 0;
-
-		
 		//MM
 		/*for (FileOffset fo : this.select(offset, requested)) {
 			// TODO: remove cast to int when large ByteBuffer support is
@@ -82,7 +80,6 @@ public class FileCollectionStorage implements TorrentByteStorage {
 			buffer.limit((int)(bytes + fo.length));
 			bytes += fo.file.read(buffer, fo.offset);
 		}
-
 		if (bytes < requested) {
 			throw new IOException("Storage collection read underrun!");
 		}*/
@@ -93,7 +90,6 @@ public class FileCollectionStorage implements TorrentByteStorage {
 	@Override
 	public int write(ByteBuffer buffer, long offset,Piece p) throws IOException {
 		int requested = buffer.remaining();
-
 		int bytes = 0;
 		this.files.get(p.index).size=p.length ;
 		bytes=this.files.get(p.index).write(buffer, 0,p);

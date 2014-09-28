@@ -412,7 +412,7 @@ public class Torrent {
 						.append(pathElement.getString());
 				}
 				
-				this.files.add(new TorrentFile(//ClientMain.InterfaceName
+				this.files.add(new TorrentFile(
 					new File(this.name, localPath.toString()),
 					fileInfo.get("length").getLong(), fileInfo.get("table index").getInt()));
 			}

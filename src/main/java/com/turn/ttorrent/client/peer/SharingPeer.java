@@ -303,11 +303,10 @@ public class SharingPeer extends Peer implements MessageListener {
 		if (!force) {
 			// Cancel all outgoing requests, and send a NOT_INTERESTED message to
 			// the peer.
-
 			this.cancelPendingRequests();
 			this.send(PeerMessage.NotInterestedMessage.craft());
 		}
-System.out.println("unbindunbindunbindunbindunbind");
+
 		synchronized (this.exchangeLock) {
 			if (this.exchange != null) {
 				this.exchange.close();
@@ -380,7 +379,7 @@ System.out.println("unbindunbindunbindunbindunbind");
 	 * Re-fill the pipeline to get download the next blocks from the peer.
 	 * </p>
 	 */
-	private void requestNextBlocks() {System.out.println("requestNextBlocks");
+	private void requestNextBlocks() {
 		synchronized (this.requestsLock) {
 			if (this.requests == null || this.requestedPiece == null) {
 				// If we've been taken out of a piece download context it means our
@@ -392,7 +391,6 @@ System.out.println("unbindunbindunbindunbindunbind");
 
 			while (this.requests.remainingCapacity() > 0 &&
 					this.lastRequestedOffset < this.requestedPiece.size()) {
-				
 				PeerMessage.RequestMessage request = PeerMessage.RequestMessage
 					.craft(
 						this.requestedPiece.getIndex(),
@@ -464,7 +462,7 @@ System.out.println("unbindunbindunbindunbindunbind");
 				for (PeerMessage.RequestMessage request : this.requests) {
 					System.out.println("QQQQQQQcancelPendingRequests  piece="+request.getPiece());
 					this.send(PeerMessage.CancelMessage.craft(request.getPiece(),
-						request.getOffset(), request.getLength()));
+					request.getOffset(), request.getLength()));
 					requests.add(request);
 				}
 			}
@@ -559,7 +557,7 @@ System.out.println("unbindunbindunbindunbindunbind");
 			}
 
 			if (request.getLength() >
-					PeerMessage.RequestMessage.MAX_REQUEST_SIZE) {
+				PeerMessage.RequestMessage.MAX_REQUEST_SIZE) {
 				logger.warn("Peer {} requested a block too big, " +
 					"terminating exchange.", this);
 				this.unbind(true);
@@ -573,23 +571,19 @@ System.out.println("unbindunbindunbindunbindunbind");
 			// the remote peer, so let's queue a message with that block
 			
 			try {
-				System.out.println(" offset:+" +request.getOffset()+ " length:+" +request.getLength() +"local piece size is "+rp.size()+"msg for piece"+request.getPiece());
-				if (request.getOffset() + request.getLength() <= rp.size()) {
-				
-				ByteBuffer block = rp.read(request.getOffset(),request.getLength());
-				this.send(PeerMessage.PieceMessage.craft(request.getPiece(),
-							request.getOffset(), block));
-				this.upload.add(block.capacity());
+					System.out.println(" offset:+" +request.getOffset()+ " length:+" +request.getLength() +"local piece size is "+rp.size()+"msg for piece"+request.getPiece());
+					if (request.getOffset() + request.getLength() <= rp.size()) {
+					
+					ByteBuffer block = rp.read(request.getOffset(),request.getLength());
+					this.send(PeerMessage.PieceMessage.craft(request.getPiece(),request.getOffset(), block));
+					this.upload.add(block.capacity());
 				
 				}
-				else{
 				
-				System.out.println("FINISH send the 1   msg for piece"+request.getPiece()) ;
-			
-					this.send(PeerMessage.PieceMessage.craft(request.getPiece(),
-							-1, ByteBuffer.allocate(request.getLength())));
+				else{
+					System.out.println("FINISH send the 1   msg for piece"+request.getPiece()) ;
+					this.send(PeerMessage.PieceMessage.craft(request.getPiece(),-1, ByteBuffer.allocate(request.getLength())));
 					this.firePieceSent(rp);
-					
 				}
 			} catch (IOException ioe) {
 				this.fireIOException(new IOException(
@@ -636,11 +630,6 @@ System.out.println("unbindunbindunbindunbindunbind");
 							logger.debug("Discarding block for already completed " + p);
 							break;
 						}
-						
-										
-						
-						
-													
 						
 						// If the block offset equals the piece size and the block
 						// length is 0, it means the piece has been entirely
