@@ -17,6 +17,7 @@ package com.turn.ttorrent.client.storage;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import com.turn.ttorrent.client.Piece;
 
 
 /**
@@ -59,7 +60,7 @@ public interface TorrentByteStorage {
 	 * @throws IOException If an I/O error occurs while reading from the
 	 * byte storage.
 	 */
-	public int read(ByteBuffer buffer, long offset) throws IOException;
+	public int read(ByteBuffer buffer, long offset,Piece p) throws IOException;
 
 	/**
 	 * Write bytes to the byte storage.
@@ -76,7 +77,7 @@ public interface TorrentByteStorage {
 	 * @throws IOException If an I/O error occurs while writing to the byte
 	 * storage.
 	 */
-	public int write(ByteBuffer block, long offset) throws IOException;
+	public int write(ByteBuffer block, long offset,Piece piece) throws IOException;
 
 	/**
 	 * Close this byte storage.

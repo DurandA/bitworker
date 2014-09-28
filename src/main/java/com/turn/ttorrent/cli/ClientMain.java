@@ -42,6 +42,7 @@ public class ClientMain {
 
 	private static final Logger logger =
 		LoggerFactory.getLogger(ClientMain.class);
+	public static String InterfaceName=""; 
 
 	/**
 	 * Default data output directory.
@@ -138,6 +139,7 @@ public class ClientMain {
 		String outputValue = (String)parser.getOptionValue(output,
 			DEFAULT_OUTPUT_DIRECTORY);
 		String ifaceValue = (String)parser.getOptionValue(iface);
+		InterfaceName=ifaceValue;
 		int seedTimeValue = (Integer)parser.getOptionValue(seedTime, -1);
 
 		double maxDownloadRate = (Double)parser.getOptionValue(maxDownload, 0.0);

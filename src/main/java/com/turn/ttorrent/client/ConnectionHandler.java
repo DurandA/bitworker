@@ -345,7 +345,6 @@ public class ConnectionHandler implements Runnable {
 			throw new IllegalStateException(
 				"Connection handler is not accepting new peers at this time!");
 		}
-
 		this.executor.submit(new ConnectorTask(this, peer));
 	}
 
@@ -491,7 +490,7 @@ public class ConnectionHandler implements Runnable {
 				while (!channel.isConnected()) {
 					Thread.sleep(10);
 				}
-
+				
 				logger.debug("Connected. Sending handshake to {}...", this.peer);
 				channel.configureBlocking(true);
 				int sent = this.handler.sendHandshake(channel);

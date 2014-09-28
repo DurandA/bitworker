@@ -16,14 +16,18 @@
 package com.turn.ttorrent.client.storage;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
-
+import javax.sound.sampled.AudioFormat.Encoding;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.turn.ttorrent.client.Piece;
 
 
 /**
@@ -45,7 +49,7 @@ public class FileStorage implements TorrentByteStorage {
 	private final File target;
 	private final File partial;
 	private final long offset;
-	private final long size;
+	long size;
 
 	private RandomAccessFile raf;
 	private FileChannel channel;
@@ -104,28 +108,23 @@ public class FileStorage implements TorrentByteStorage {
 	}
 
 	@Override
-	public int read(ByteBuffer buffer, long offset) throws IOException {
+	public int read(ByteBuffer buffer, long offset,Piece p) throws IOException {
 		int requested = buffer.remaining();
 
 		if (offset + requested > this.size) {
 			throw new IllegalArgumentException("Invalid storage read request!");
 		}
 
-		int bytes = this.channel.read(buffer, offset);
-		if (bytes < requested) {
-			throw new IOException("Storage underrun!");
-		}
-
+		int bytes = this.channel.read(buffer,offset);
 		return bytes;
 	}
 
 	@Override
-	public int write(ByteBuffer buffer, long offset) throws IOException {
+	public int write(ByteBuffer buffer, long offset,Piece p) throws IOException {
 		int requested = buffer.remaining();
-
-		if (offset + requested > this.size) {
+		/*if (offset + requested > this.size) {
 			throw new IllegalArgumentException("Invalid storage write request!");
-		}
+		}*/
 
 		return this.channel.write(buffer, offset);
 	}

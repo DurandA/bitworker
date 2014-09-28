@@ -25,6 +25,7 @@ import java.io.Serializable;
 import java.net.SocketException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
+import java.nio.charset.Charset;
 import java.util.BitSet;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -359,7 +360,7 @@ public class SharingPeer extends Peer implements MessageListener {
 			logger.warn("What's going on? {}", up.getMessage(), up);
 			throw up; // ah ah.
 		}
-
+		System.out.println("DOWNLOADINGPIECE+ "+piece);
 		this.requests = new LinkedBlockingQueue<PeerMessage.RequestMessage>(
 				SharingPeer.MAX_PIPELINED_REQUESTS);
 		this.requestedPiece = piece;
@@ -451,14 +452,17 @@ public class SharingPeer extends Peer implements MessageListener {
 	 * </p>
 	 */
 	public Set<PeerMessage.RequestMessage> cancelPendingRequests() {
+		
 		synchronized (this.requestsLock) {
 			Set<PeerMessage.RequestMessage> requests =
 				new HashSet<PeerMessage.RequestMessage>();
 
 			if (this.requests != null) {
+				
 				for (PeerMessage.RequestMessage request : this.requests) {
+					System.out.println("QQQQQQQcancelPendingRequests  piece="+request.getPiece());
 					this.send(PeerMessage.CancelMessage.craft(request.getPiece(),
-								request.getOffset(), request.getLength()));
+					request.getOffset(), request.getLength()));
 					requests.add(request);
 				}
 			}
@@ -476,6 +480,7 @@ public class SharingPeer extends Peer implements MessageListener {
 	 */
 	@Override
 	public synchronized void handleMessage(PeerMessage msg) {
+		System.out.println("handleMessage "+msg.getType());
 		switch (msg.getType()) {
 			case KEEP_ALIVE:
 				// Nothing to do, we're keeping the connection open anyways.
@@ -483,6 +488,7 @@ public class SharingPeer extends Peer implements MessageListener {
 			case CHOKE:
 				this.choked = true;
 				this.firePeerChoked();
+				System.out.println("LLLLLLLLLLLLLL");
 				this.cancelPendingRequests();
 				break;
 			case UNCHOKE:
@@ -535,47 +541,56 @@ public class SharingPeer extends Peer implements MessageListener {
 				break;
 			case REQUEST:
 				PeerMessage.RequestMessage request =
-					(PeerMessage.RequestMessage)msg;
-				Piece rp = this.torrent.getPiece(request.getPiece());
-
-				// If we are choking from this peer and it still sends us
-				// requests, it is a violation of the BitTorrent protocol.
-				// Similarly, if the peer requests a piece we don't have, it
-				// is a violation of the BitTorrent protocol. In these
-				// situation, terminate the connection.
-				if (this.isChoking() || !rp.isValid()) {
-					logger.warn("Peer {} violated protocol, " +
-						"terminating exchange.", this);
-					this.unbind(true);
-					break;
-				}
-
-				if (request.getLength() >
-						PeerMessage.RequestMessage.MAX_REQUEST_SIZE) {
-					logger.warn("Peer {} requested a block too big, " +
-						"terminating exchange.", this);
-					this.unbind(true);
-					break;
-				}
-
-				// At this point we agree to send the requested piece block to
-				// the remote peer, so let's queue a message with that block
-				try {
-					ByteBuffer block = rp.read(request.getOffset(),
-									request.getLength());
-					this.send(PeerMessage.PieceMessage.craft(request.getPiece(),
-								request.getOffset(), block));
-					this.upload.add(block.capacity());
-
-					if (request.getOffset() + request.getLength() == rp.size()) {
-						this.firePieceSent(rp);
-					}
-				} catch (IOException ioe) {
-					this.fireIOException(new IOException(
-							"Error while sending piece block request!", ioe));
-				}
-
+				(PeerMessage.RequestMessage)msg;
+			Piece rp = this.torrent.getPiece(request.getPiece());
+			System.out.println(" XXoffset:+" +request.getOffset()+ " length:+" +request.getLength() +"local piece size is "+rp.size());
+			// If we are choking from this peer and it still sends us
+			// requests, it is a violation of the BitTorrent protocol.
+			// Similarly, if the peer requests a piece we don't have, it
+			// is a violation of the BitTorrent protocol. In these
+			// situation, terminate the connection.
+			if (this.isChoking() || !rp.isValid()) {
+				logger.warn("Peer {} violated protocol, " +
+					"terminating exchange.", this);
+				this.unbind(true);
 				break;
+			}
+
+			if (request.getLength() >
+				PeerMessage.RequestMessage.MAX_REQUEST_SIZE) {
+				logger.warn("Peer {} requested a block too big, " +
+					"terminating exchange.", this);
+				this.unbind(true);
+				break;
+			}
+			if (request.getOffset()  > rp.size()) {
+				
+				break;
+			}
+			// At this point we agree to send the requested piece block to
+			// the remote peer, so let's queue a message with that block
+			
+			try {
+					System.out.println(" offset:+" +request.getOffset()+ " length:+" +request.getLength() +"local piece size is "+rp.size()+"msg for piece"+request.getPiece());
+					if (request.getOffset() + request.getLength() <= rp.size()) {
+					
+					ByteBuffer block = rp.read(request.getOffset(),request.getLength());
+					this.send(PeerMessage.PieceMessage.craft(request.getPiece(),request.getOffset(), block));
+					this.upload.add(block.capacity());
+				
+				}
+				
+				else{
+					System.out.println("FINISH send the 1   msg for piece"+request.getPiece()) ;
+					this.send(PeerMessage.PieceMessage.craft(request.getPiece(),-1, ByteBuffer.allocate(request.getLength())));
+					this.firePieceSent(rp);
+				}
+			} catch (IOException ioe) {
+				this.fireIOException(new IOException(
+						"Error while sending piece block request!", ioe));
+			}
+
+			break;
 			case PIECE:
 				// Record the incoming piece block.
 
@@ -592,27 +607,47 @@ public class SharingPeer extends Peer implements MessageListener {
 
 				try {
 					synchronized (p) {
-						if (p.isValid()) {
+						
+						if(piece.getOffset()==-1){
+							p.record(piece.getBlock(), piece.getOffset(),true);
+							System.out.println("FINISH recived the 1  for peice "+p.getIndex());
+							
+						}else{	p.record(piece.getBlock(), piece.getOffset(),false);}
+						
+						//if (p.isValid()) {
+						if(piece.getOffset()==-1){
 							this.requestedPiece = null;
+							
+							//frombelow
+							p.validate();
+							
+							System.out.println("FINISH recived the 1  for peice "+p.getIndex());
+							this.firePieceCompleted(p);
+							//frombelow
+							
 							this.cancelPendingRequests();
 							this.firePeerReady();
 							logger.debug("Discarding block for already completed " + p);
 							break;
 						}
-
-						p.record(piece.getBlock(), piece.getOffset());
-
+						
 						// If the block offset equals the piece size and the block
 						// length is 0, it means the piece has been entirely
 						// downloaded. In this case, we have nothing to save, but
 						// we should validate the piece.
-						if (piece.getOffset() + piece.getBlock().capacity()
-								== p.size()) {
-							p.validate();
+						//if (piece.getOffset() + piece.getBlock().capacity()
+								//== p.size()) {
+							if (piece.getOffset()==-1 ){
+							/*p.validate();
+						
+							System.out.println("FINISH recived the 1  for peice "+p.getIndex());
 							this.firePieceCompleted(p);
 							this.requestedPiece = null;
-							this.firePeerReady();
+							
+							this.firePeerReady();*/
+							
 						} else {
+							System.out.println("finish piece.getOffset() + piece.getBlock().capacity()  "+piece.getOffset() +" , "+ piece.getBlock().capacity()+"  ,"+p.size() +"for piece "+piece.getPiece());
 							this.requestNextBlocks();
 						}
 					}
