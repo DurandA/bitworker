@@ -206,14 +206,9 @@ public class SharedTorrent extends Torrent implements PeerActivityListener {
 			}
 
 			actual.getParentFile().mkdirs();
-			//MMM delete file.size put zero
-			
-			files.add(new FileStorage(actual, offset, 0));
-			
-			//MMM delete
-			//offset += file.size;
+			files.add(new FileStorage(actual, offset, file.size));
+			offset += file.size;
 		}
-
 		this.bucket = new FileCollectionStorage(files, this.getSize());
 
 		this.random = new Random(System.currentTimeMillis());
@@ -335,9 +330,11 @@ public class SharedTorrent extends Torrent implements PeerActivityListener {
 		}
 
 		int threads = getHashingThreadsCount();
-		int nPieces = 4;
+		int nPieces = (int) (Math.ceil(
+				(double)this.getSize() / this.pieceLength));
+		System.out.println(nPieces+"nPieces");
 		int step = 10;
-		System.out.println("OOOOOOOOOOOO:"+this.getSize());
+		
 		this.pieces = new Piece[nPieces];
 		this.completedPieces = new BitSet(nPieces);
 		//this.piecesHashes.clear();
