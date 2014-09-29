@@ -337,9 +337,10 @@ public class Piece implements Comparable<Piece> {
 			this.data = ByteBuffer.allocate((int)this.length);
 		}
 		
-		int pos = block.position();
 		this.data.position(offset);
 		this.data.put(block);
+		
+		int pos = block.position();
 		block.position(pos);
 		this.length = this.data.position();
 		if(isFinished){

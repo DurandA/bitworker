@@ -99,6 +99,7 @@ public class RWGenerator implements Runnable {
 		
 		ByteBuffer generatdPieceAsByteBuffer=ByteBuffer
 				.wrap(IOUtils.toByteArray(pr.getInputStream()));
+		
 		p.recordLocal(generatdPieceAsByteBuffer, 0, true);
 		
 		BufferedReader bre = new BufferedReader
