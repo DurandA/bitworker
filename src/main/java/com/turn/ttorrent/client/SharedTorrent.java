@@ -89,9 +89,10 @@ public class SharedTorrent extends Torrent implements PeerActivityListener {
 	private long downloaded;
 	private long left;
 
-	private final TorrentByteStorage bucket;
+	public final TorrentByteStorage bucket;
 
-	private final int pieceLength;
+	public final int pieceLength;
+	public final String parentPath;
 	//private final ByteBuffer piecesHashes;
 
 	private boolean initialized;
@@ -178,7 +179,7 @@ public class SharedTorrent extends Torrent implements PeerActivityListener {
 			throw new IllegalArgumentException("Invalid parent directory!");
 		}
 
-		String parentPath = parent.getCanonicalPath();
+		 parentPath = parent.getCanonicalPath();
 
 		try {
 			this.pieceLength = this.decoded_info.get("piece length").getInt();
@@ -197,17 +198,27 @@ public class SharedTorrent extends Torrent implements PeerActivityListener {
 
 		List<FileStorage> files = new LinkedList<FileStorage>();
 		long offset = 0L;
+		
 		for (Torrent.TorrentFile file : this.files) {
-			File actual = new File(parent, file.file.getPath());
+			
 
-			if (!actual.getCanonicalPath().startsWith(parentPath)) {
+			
+			
+			for (int i = 0; i < (file.size/this.pieceLength); i++) {
+				//"
+				System.out.println(parentPath);
+				File actual = new File(parent+"/"+ file.file.getPath()+"_part_"+i);
+				if (!actual.getCanonicalPath().startsWith(parentPath)) {
 				throw new SecurityException("Torrent file path attempted " +
 					"to break directory jail!");
 			}
-
-			actual.getParentFile().mkdirs();
-			files.add(new FileStorage(actual, offset, file.size));
-			offset += file.size;
+				
+					actual.getParentFile().mkdirs();
+					files.add(new FileStorage(actual, offset, 0));
+			}
+			
+		
+			//offset += file.size;
 		}
 		this.bucket = new FileCollectionStorage(files, this.getSize());
 
@@ -578,7 +589,7 @@ public class SharedTorrent extends Torrent implements PeerActivityListener {
 		if (!this.isComplete()) {
 			throw new IllegalStateException("Torrent download is not complete!");
 		}
-
+		
 		this.bucket.finish();
 	}
 

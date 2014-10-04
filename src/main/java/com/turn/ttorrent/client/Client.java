@@ -20,12 +20,19 @@ import com.turn.ttorrent.client.announce.AnnounceException;
 import com.turn.ttorrent.client.announce.AnnounceResponseListener;
 import com.turn.ttorrent.client.peer.PeerActivityListener;
 import com.turn.ttorrent.client.peer.SharingPeer;
+import com.turn.ttorrent.client.storage.FileStorage;
 import com.turn.ttorrent.common.Peer;
 import com.turn.ttorrent.common.Torrent;
 import com.turn.ttorrent.common.protocol.PeerMessage;
 import com.turn.ttorrent.common.protocol.TrackerMessage;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
@@ -33,6 +40,7 @@ import java.nio.channels.SocketChannel;
 import java.util.BitSet;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Observable;
 import java.util.Random;
@@ -881,10 +889,25 @@ public class Client extends Observable implements Runnable,
 							requests, remote);
 					}
 				}
-
+				
 				this.torrent.finish();
-
+	
+				
+				for (Torrent.TorrentFile file : this.torrent.files) {
+					File[] files = new File[(int) (file.size/this.torrent.pieceLength)];
+					for (int i = 0; i < (file.size/this.torrent.pieceLength); i++) {
+						files[i]=  new File(this.torrent.parentPath,file.getPath()+"_part_"+i);
+						
+					}
+				
+					System.out.println(file.getPath());
+				
+					mergeFiles(files,new File(this.torrent.parentPath,file.getPath()+"_FINAL"));
+					
+					
+				}
 				try {
+					
 					this.announce.getCurrentTrackerClient()
 						.announce(TrackerMessage
 							.AnnounceRequestMessage
@@ -893,13 +916,55 @@ public class Client extends Observable implements Runnable,
 					logger.warn("Error announcing completion event to " +
 						"tracker: {}", ae.getMessage());
 				}
-
+		
+					
+					
+					
+				}
 				logger.info("Download is complete and finalized.");
 				this.seed();
 			}
 		}
-	}
+	
 
+
+	public static void mergeFiles(File[] files, File mergedFile) {
+		 
+		FileWriter fstream = null;
+		BufferedWriter out = null;
+		try {
+			fstream = new FileWriter(mergedFile, true);
+			 out = new BufferedWriter(fstream);
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+ 
+		for (File f : files) {
+			System.out.println("merging: " + f.getName());
+			FileInputStream fis;
+			try {
+				fis = new FileInputStream(f);
+				BufferedReader in = new BufferedReader(new InputStreamReader(fis));
+ 
+				String aLine;
+				while ((aLine = in.readLine()) != null) {
+					out.write(aLine);
+					out.newLine();
+				}
+ 
+				in.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+ 
+		try {
+			out.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+ 
+	}
 	@Override
 	public void handlePeerDisconnected(SharingPeer peer) {
 		if (this.connected.remove(peer.hasPeerId()

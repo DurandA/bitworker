@@ -336,13 +336,17 @@ public class Piece implements Comparable<Piece> {
 			// implemented in Java.
 			this.data = ByteBuffer.allocate((int)this.length);
 		}
-		
+	
 		this.data.position(offset);
-		this.data.put(block);
+        this.data.put(block);
+        
+        int pos = block.position();
+        block.position(pos);
+        this.length = this.data.position();	
 		
-		int pos = block.position();
-		block.position(pos);
-		this.length = this.data.position();
+	
+		System.out.println("AAAAAAA "+this.length );
+		
 		if(isFinished){
 			this.data.rewind();
 			logger.trace("Recording {}...", this);

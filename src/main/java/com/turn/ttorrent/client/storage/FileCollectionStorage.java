@@ -91,6 +91,8 @@ public class FileCollectionStorage implements TorrentByteStorage {
 	public int write(ByteBuffer buffer, long offset,Piece p) throws IOException {
 		int requested = buffer.remaining();
 		int bytes = 0;
+		buffer.limit((int) p.size());
+		System.out.println("PPPPPPP ");
 		this.files.get(p.getIndex()).size = p.size();
 		bytes=this.files.get(p.getIndex()).write(buffer, 0,p);
 		

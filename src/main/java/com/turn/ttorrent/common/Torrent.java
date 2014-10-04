@@ -119,7 +119,7 @@ public class Torrent {
 		public String getPath() {
 			return this.file.getPath();
 		}
-
+		
 		@Override
 		public int getFileIndex() {
 			return this.fileIndex;
@@ -143,7 +143,7 @@ public class Torrent {
 	private final String command;
 	private final int pieceLength;
 	private final long size;
-	protected final List<TorrentFile> files;
+	public final List<TorrentFile> files;
 
 	private final boolean seeder;
 

@@ -15,11 +15,15 @@
  */
 package com.turn.ttorrent.client.storage;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
@@ -46,7 +50,7 @@ public class FileStorage implements TorrentByteStorage {
 	private static final Logger logger =
 		LoggerFactory.getLogger(FileStorage.class);
 
-	private final File target;
+	public final File target;
 	private final File partial;
 	private final long offset;
 	long size;
@@ -139,6 +143,8 @@ public class FileStorage implements TorrentByteStorage {
 	}
 
 	/** Move the partial file to its final location.
+	 * This part is called when the torrent is finished
+	 * Will merge all the pieces to files
 	 */
 	@Override
 	public synchronized void finish() throws IOException {
@@ -152,7 +158,7 @@ public class FileStorage implements TorrentByteStorage {
 		if (this.isFinished()) {
 			return;
 		}
-
+		
 		this.raf.close();
 		FileUtils.deleteQuietly(this.target);
 		FileUtils.moveFile(this.current, this.target);
@@ -169,8 +175,11 @@ public class FileStorage implements TorrentByteStorage {
 		logger.info("Moved torrent data from {} to {}.",
 			this.partial.getName(),
 			this.target.getName());
-	}
+		
 
+		
+	}
+	
 	@Override
 	public boolean isFinished() {
 		return this.current.equals(this.target);
