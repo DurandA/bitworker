@@ -312,13 +312,10 @@ public class Piece implements Comparable<Piece> {
 			block.position(pos);
 		} else {
 			this.length = this.data.position();
-			System.out.println("isTheEnd  is valid="+isValid()+" for piece "+this.index+" the size is "+this.length +" write to offse t"+this.offset+" a data length of "+this.data.capacity());
 			this.data.rewind();
 			logger.trace("Recording {}...", this);
 			this.data.limit((int) this.length);
-			int byteswrittentofile=this.bucket.write(this.data,0,this);
 			this.data = null;
-			System.out.println("bytes written to file "+byteswrittentofile);
 		}
 		
 		/*if (block.remaining() + offset == this.length) {
@@ -343,9 +340,6 @@ public class Piece implements Comparable<Piece> {
         int pos = block.position();
         block.position(pos);
         this.length = this.data.position();	
-		
-	
-		System.out.println("AAAAAAA "+this.length );
 		
 		if(isFinished){
 			this.data.rewind();

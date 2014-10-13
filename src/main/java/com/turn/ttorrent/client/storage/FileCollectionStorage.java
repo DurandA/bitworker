@@ -92,7 +92,6 @@ public class FileCollectionStorage implements TorrentByteStorage {
 		int requested = buffer.remaining();
 		int bytes = 0;
 		buffer.limit((int) p.size());
-		System.out.println("PPPPPPP ");
 		this.files.get(p.getIndex()).size = p.size();
 		bytes=this.files.get(p.getIndex()).write(buffer, 0,p);
 		

@@ -201,12 +201,7 @@ public class SharedTorrent extends Torrent implements PeerActivityListener {
 		
 		for (Torrent.TorrentFile file : this.files) {
 			
-
-			
-			
 			for (int i = 0; i < (file.size/this.pieceLength); i++) {
-				//"
-				System.out.println(parentPath);
 				File actual = new File(parent+"/"+ file.file.getPath()+"_part_"+i);
 				if (!actual.getCanonicalPath().startsWith(parentPath)) {
 				throw new SecurityException("Torrent file path attempted " +
@@ -216,7 +211,6 @@ public class SharedTorrent extends Torrent implements PeerActivityListener {
 					actual.getParentFile().mkdirs();
 					files.add(new FileStorage(actual, offset, 0));
 			}
-			
 		
 			//offset += file.size;
 		}
@@ -343,7 +337,6 @@ public class SharedTorrent extends Torrent implements PeerActivityListener {
 		int threads = getHashingThreadsCount();
 		int nPieces = (int) (Math.ceil(
 				(double)this.getSize() / this.pieceLength));
-		System.out.println(nPieces+"nPieces");
 		int step = 10;
 		
 		this.pieces = new Piece[nPieces];

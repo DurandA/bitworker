@@ -360,7 +360,6 @@ public class SharingPeer extends Peer implements MessageListener {
 			logger.warn("What's going on? {}", up.getMessage(), up);
 			throw up; // ah ah.
 		}
-		System.out.println("DOWNLOADINGPIECE+ "+piece);
 		this.requests = new LinkedBlockingQueue<PeerMessage.RequestMessage>(
 				SharingPeer.MAX_PIPELINED_REQUESTS);
 		this.requestedPiece = piece;
@@ -460,7 +459,6 @@ public class SharingPeer extends Peer implements MessageListener {
 			if (this.requests != null) {
 				
 				for (PeerMessage.RequestMessage request : this.requests) {
-					System.out.println("QQQQQQQcancelPendingRequests  piece="+request.getPiece());
 					this.send(PeerMessage.CancelMessage.craft(request.getPiece(),
 					request.getOffset(), request.getLength()));
 					requests.add(request);
@@ -480,7 +478,6 @@ public class SharingPeer extends Peer implements MessageListener {
 	 */
 	@Override
 	public synchronized void handleMessage(PeerMessage msg) {
-		System.out.println("handleMessage "+msg.getType());
 		switch (msg.getType()) {
 			case KEEP_ALIVE:
 				// Nothing to do, we're keeping the connection open anyways.
@@ -488,7 +485,6 @@ public class SharingPeer extends Peer implements MessageListener {
 			case CHOKE:
 				this.choked = true;
 				this.firePeerChoked();
-				System.out.println("LLLLLLLLLLLLLL");
 				this.cancelPendingRequests();
 				break;
 			case UNCHOKE:
@@ -543,7 +539,6 @@ public class SharingPeer extends Peer implements MessageListener {
 				PeerMessage.RequestMessage request =
 				(PeerMessage.RequestMessage)msg;
 			Piece rp = this.torrent.getPiece(request.getPiece());
-			System.out.println(" XXoffset:+" +request.getOffset()+ " length:+" +request.getLength() +"local piece size is "+rp.size());
 			// If we are choking from this peer and it still sends us
 			// requests, it is a violation of the BitTorrent protocol.
 			// Similarly, if the peer requests a piece we don't have, it
@@ -571,7 +566,6 @@ public class SharingPeer extends Peer implements MessageListener {
 			// the remote peer, so let's queue a message with that block
 			
 			try {
-					System.out.println(" offset:+" +request.getOffset()+ " length:+" +request.getLength() +"local piece size is "+rp.size()+"msg for piece"+request.getPiece());
 					if (request.getOffset() + request.getLength() <= rp.size()) {
 					
 					ByteBuffer block = rp.read(request.getOffset(),request.getLength());
@@ -581,7 +575,6 @@ public class SharingPeer extends Peer implements MessageListener {
 				}
 				
 				else{
-					System.out.println("FINISH send the 1   msg for piece"+request.getPiece()) ;
 					this.send(PeerMessage.PieceMessage.craft(request.getPiece(),-1, ByteBuffer.allocate(request.getLength())));
 					this.firePieceSent(rp);
 				}
@@ -610,7 +603,6 @@ public class SharingPeer extends Peer implements MessageListener {
 						
 						if(piece.getOffset()==-1){
 							p.record(piece.getBlock(), piece.getOffset(),true);
-							System.out.println("FINISH recived the 1  for peice "+p.getIndex());
 							
 						}else{	p.record(piece.getBlock(), piece.getOffset(),false);}
 						
@@ -618,12 +610,8 @@ public class SharingPeer extends Peer implements MessageListener {
 						if(piece.getOffset()==-1){
 							this.requestedPiece = null;
 							
-							//frombelow
 							p.validate();
-							
-							System.out.println("FINISH recived the 1  for peice "+p.getIndex());
 							this.firePieceCompleted(p);
-							//frombelow
 							
 							this.cancelPendingRequests();
 							this.firePeerReady();
@@ -639,15 +627,13 @@ public class SharingPeer extends Peer implements MessageListener {
 								//== p.size()) {
 							if (piece.getOffset()==-1 ){
 							/*p.validate();
-						
-							System.out.println("FINISH recived the 1  for peice "+p.getIndex());
+							
 							this.firePieceCompleted(p);
 							this.requestedPiece = null;
 							
 							this.firePeerReady();*/
 							
 						} else {
-							System.out.println("finish piece.getOffset() + piece.getBlock().capacity()  "+piece.getOffset() +" , "+ piece.getBlock().capacity()+"  ,"+p.size() +"for piece "+piece.getPiece());
 							this.requestNextBlocks();
 						}
 					}

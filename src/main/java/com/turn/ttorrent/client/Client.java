@@ -20,7 +20,6 @@ import com.turn.ttorrent.client.announce.AnnounceException;
 import com.turn.ttorrent.client.announce.AnnounceResponseListener;
 import com.turn.ttorrent.client.peer.PeerActivityListener;
 import com.turn.ttorrent.client.peer.SharingPeer;
-import com.turn.ttorrent.client.storage.FileStorage;
 import com.turn.ttorrent.common.Peer;
 import com.turn.ttorrent.common.Torrent;
 import com.turn.ttorrent.common.protocol.PeerMessage;
@@ -40,7 +39,6 @@ import java.nio.channels.SocketChannel;
 import java.util.BitSet;
 import java.util.Comparator;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Observable;
 import java.util.Random;
@@ -79,7 +77,7 @@ import org.slf4j.LoggerFactory;
  * @author mpetazzoni
  */
 public class Client extends Observable implements Runnable,
-	AnnounceResponseListener, IncomingConnectionListener, PeerActivityListener, RWGenerationListener {
+	AnnounceResponseListener, IncomingConnectionListener, PeerActivityListener, GenerationListener {
 
 	private static final Logger logger =
 		LoggerFactory.getLogger(Client.class);
@@ -114,7 +112,8 @@ public class Client extends Observable implements Runnable,
 	private long seed;
 
 	private ConnectionHandler service;
-	private RWGenerator generator;
+	private Generator generator;
+	private DHTManager dhtManager;
 	private Announce announce;
 	private ConcurrentMap<String, SharingPeer> peers;
 	private ConcurrentMap<String, SharingPeer> connected;
@@ -143,9 +142,13 @@ public class Client extends Observable implements Runnable,
 		this.service = new ConnectionHandler(this.torrent, id, address);
 		this.service.register(this);
 		
-		// Initialize the RT generator thread, and register ourselves to it.
-		this.generator = new RWGenerator(this.torrent);
+		// Initialize the generator thread, and register ourselves to it.
+		this.generator = new Generator(this.torrent);
 		this.generator.register(this);
+		
+		// Initialize the DHT manager thread, and register ourselves to it.
+		this.dhtManager = new DHTManager(this.torrent);
+		this.dhtManager.register(this);
 
 		this.self = new Peer(
 			this.service.getSocketAddress()
@@ -375,6 +378,7 @@ public class Client extends Observable implements Runnable,
 		this.announce.start();
 		this.service.start();
 		this.generator.start();
+		this.dhtManager.start();
 
 		int optimisticIterations = 0;
 		int rateComputationIterations = 0;
@@ -418,7 +422,8 @@ public class Client extends Observable implements Runnable,
 			logger.warn("Error while releasing bound channel: {}!",
 				ioe.getMessage(), ioe);
 		}
-
+		
+		this.dhtManager.stop();
 		this.announce.stop();
 
 		// Close all peer connections
@@ -843,7 +848,6 @@ public class Client extends Observable implements Runnable,
 	@Override
 	public void handlePieceCompleted(SharingPeer peer, Piece piece)
 		throws IOException {
-		System.out.println("handlePieceCompleted");
 		synchronized (this.torrent) {
 			if (piece.isValid()) {
 				// Make sure the piece is marked as completed in the torrent
@@ -864,7 +868,6 @@ public class Client extends Observable implements Runnable,
 				// Send a HAVE message to all connected peers
 				PeerMessage have = PeerMessage.HaveMessage.craft(piece.getIndex());
 				for (SharingPeer remote : this.connected.values()) {
-					System.out.println("AAAAAAAAAAAAAAAAAAAAAAA");
 					remote.send(have);
 				}
 
@@ -883,7 +886,6 @@ public class Client extends Observable implements Runnable,
 				// Cancel all remaining outstanding requests
 				for (SharingPeer remote : this.connected.values()) {
 					if (remote.isDownloading()) {
-						System.out.println("LLLLLLLLLLLLLL");
 						int requests = remote.cancelPendingRequests().size();
 						logger.info("Cancelled {} remaining pending requests on {}.",
 							requests, remote);
@@ -899,8 +901,6 @@ public class Client extends Observable implements Runnable,
 						files[i]=  new File(this.torrent.parentPath,file.getPath()+"_part_"+i);
 						
 					}
-				
-					System.out.println(file.getPath());
 				
 					mergeFiles(files,new File(this.torrent.parentPath,file.getPath()+"_FINAL"));
 					
@@ -940,7 +940,6 @@ public class Client extends Observable implements Runnable,
 		}
  
 		for (File f : files) {
-			System.out.println("merging: " + f.getName());
 			FileInputStream fis;
 			try {
 				fis = new FileInputStream(f);
