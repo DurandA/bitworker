@@ -6,6 +6,7 @@ var DHTManager = Java.type('com.turn.ttorrent.client.DHTManager')
 
 var minutes = 5, announce_interval = minutes * 60 * 1000;
 var info_hash = DHTManager.getHash()
+var port = DHTManager.getPort()
 
 dht.listen(20000, function () {
   console.log('now listening')
@@ -18,7 +19,7 @@ dht.on('ready', function () {
   // find peers for the given torrent info hash
   dht.lookup(info_hash, setInterval(function() {
     console.log("announce")
-    dht.announce(info_hash, 55555)
+    dht.announce(info_hash, port)
   }, announce_interval))
 })
 

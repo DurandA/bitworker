@@ -45,6 +45,7 @@ public class DHTManager implements Runnable{
 	
 	private static Server server;
 	private static String infoHash;
+	private static short port;
 	private static String dhtLibraryPath = "dht.js";
 
 	private static final NashornScriptEngineFactory ENGINE_FACTORY = new NashornScriptEngineFactory();
@@ -53,8 +54,9 @@ public class DHTManager implements Runnable{
 	 * Constructor for DHT Manager
 	 * @param client Bittorrent client.
 	 */
-	public DHTManager(SharedTorrent torrent){
+	public DHTManager(SharedTorrent torrent, short port){
 		this.torrent = torrent;
+		this.port = port;
 		infoHash = torrent.getHexInfoHash();
 		
 		// Initialize NashHorn.
@@ -91,6 +93,15 @@ public class DHTManager implements Runnable{
 	public static String getHash(){
 		logger.info("Info Hash requested from torrent.");
 		return infoHash;
+	}
+	
+	/**
+	 * Getter for the port of the client.
+	 * @return This client port.
+	 */
+	public static short getPort(){
+		logger.info("Port requested from client.");
+		return port;
 	}
 
 	/**

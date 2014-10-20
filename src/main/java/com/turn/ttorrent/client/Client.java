@@ -147,7 +147,7 @@ public class Client extends Observable implements Runnable,
 		this.generator.register(this);
 		
 		// Initialize the DHT manager thread, and register ourselves to it.
-		this.dhtManager = new DHTManager(this.torrent);
+		this.dhtManager = new DHTManager(this.torrent, (short)this.service.getSocketAddress().getPort());
 		this.dhtManager.register(this);
 
 		this.self = new Peer(
