@@ -315,6 +315,7 @@ public class Piece implements Comparable<Piece> {
 			this.data.rewind();
 			logger.trace("Recording {}...", this);
 			this.data.limit((int) this.length);
+			this.bucket.write(this.data,0,this);
 			this.data = null;
 		}
 		
