@@ -202,7 +202,7 @@ public class SharedTorrent extends Torrent implements PeerActivityListener {
 		for (Torrent.TorrentFile file : this.files) {
 			
 			for (int i = 0; i < (file.size/this.pieceLength); i++) {
-				File actual = new File(parent+"/"+ file.file.getPath()+"_part_"+i);
+				File actual = new File(parent+"/"+ file.file.getPath()+"."+i);
 				if (!actual.getCanonicalPath().startsWith(parentPath)) {
 				throw new SecurityException("Torrent file path attempted " +
 					"to break directory jail!");

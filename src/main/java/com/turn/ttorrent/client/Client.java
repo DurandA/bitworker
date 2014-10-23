@@ -899,11 +899,11 @@ public class Client extends Observable implements Runnable,
 				for (Torrent.TorrentFile file : this.torrent.files) {
 					File[] files = new File[(int) (file.size/this.torrent.pieceLength)];
 					for (int i = 0; i < (file.size/this.torrent.pieceLength); i++) {
-						files[i]=  new File(this.torrent.parentPath,file.getPath()+"_part_"+i);
+						files[i]=  new File(this.torrent.parentPath,file.getPath()+"."+i);
 						
 					}
 				
-					mergeFiles(files,new File(this.torrent.parentPath,file.getPath()+"_FINAL"));
+					mergeFiles(files,new File(this.torrent.parentPath,file.getPath()));
 					
 					
 				}
