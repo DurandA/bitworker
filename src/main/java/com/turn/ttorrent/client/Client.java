@@ -40,6 +40,7 @@ import java.util.BitSet;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Observable;
 import java.util.Random;
 import java.util.Set;
@@ -927,43 +928,30 @@ public class Client extends Observable implements Runnable,
 		}
 	
 
-
-	public static void mergeFiles(File[] files, File mergedFile) {
-		 
-		FileWriter fstream = null;
-		BufferedWriter out = null;
-		try {
-			fstream = new FileWriter(mergedFile, true);
-			 out = new BufferedWriter(fstream);
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
- 
+	public static void mergeFiles(File[] files, File mergedFile)  {
+		String filesPath = "";
 		for (File f : files) {
-			FileInputStream fis;
-			try {
-				fis = new FileInputStream(f);
-				BufferedReader in = new BufferedReader(new InputStreamReader(fis));
- 
-				String aLine;
-				while ((aLine = in.readLine()) != null) {
-					out.write(aLine);
-					out.newLine();
-				}
- 
-				in.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			filesPath = filesPath + f.getAbsolutePath() + " ";
 		}
- 
 		try {
-			out.close();
+			ProcessBuilder pb = new ProcessBuilder("/bin/bash","-c", "cat $FILES_LIST > "+mergedFile.getAbsolutePath());
+			Map<String, String> env = pb.environment();
+			env.put("FILES_LIST", filesPath);
+			Process pr = pb.start();
+			pr.waitFor();
+			int exitCode = pr.exitValue();
+			if(exitCode == 0) { logger.info("Files merged..."); }
 		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
- 
+
 	}
+	
+	
 	@Override
 	public void handlePeerDisconnected(SharingPeer peer) {
 		if (this.connected.remove(peer.hasPeerId()
