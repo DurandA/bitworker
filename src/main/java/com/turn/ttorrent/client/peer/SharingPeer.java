@@ -608,7 +608,10 @@ public class SharingPeer extends Peer implements MessageListener {
 					synchronized (p) {
 						
 						//if (p.isValid()) {
-						if(piece.getOffset()==-1){
+						if(piece.getOffset()==-1 || piece.getOffset() == (p.size()-(16384))){
+							
+							if(piece.getOffset() == (p.size()-(16384))){
+								p.record(piece.getBlock(), piece.getOffset(),false);}
 								p.record(piece.getBlock(), piece.getOffset(),true);
 							//	System.out.println("FINISH recived the  for peice "+p.getIndex());
 							
