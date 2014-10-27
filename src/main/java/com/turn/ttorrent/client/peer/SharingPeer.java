@@ -558,7 +558,7 @@ public class SharingPeer extends Peer implements MessageListener {
 				this.unbind(true);
 				break;
 			}
-			if (request.getOffset()  > rp.size()) {
+		if (request.getOffset()  > (rp.size()+(16384))) {
 				
 				break;
 			}
@@ -574,7 +574,13 @@ public class SharingPeer extends Peer implements MessageListener {
 				
 				}
 				
-				else{
+				else if(rp.size()-request.getOffset()>0){
+					
+					ByteBuffer block = rp.read(request.getOffset(),(int) (rp.size()-request.getOffset()));
+					
+					this.send(PeerMessage.PieceMessage.craft(request.getPiece(),request.getOffset(), block));
+					this.firePieceSent(rp);
+				}else{
 					this.send(PeerMessage.PieceMessage.craft(request.getPiece(),-1, ByteBuffer.allocate(request.getLength())));
 					this.firePieceSent(rp);
 				}
@@ -601,23 +607,30 @@ public class SharingPeer extends Peer implements MessageListener {
 				try {
 					synchronized (p) {
 						
-						if(piece.getOffset()==-1){
-							p.record(piece.getBlock(), piece.getOffset(),true);
-							
-						}else{	p.record(piece.getBlock(), piece.getOffset(),false);}
-						
 						//if (p.isValid()) {
-						if(piece.getOffset()==-1){
-							this.requestedPiece = null;
+						if(piece.getOffset()==-1 || piece.getOffset() == (p.size()-(16384))){
 							
-							p.validate();
-							this.firePieceCompleted(p);
+							if(piece.getOffset() == (p.size()-(16384))){
+								p.record(piece.getBlock(), piece.getOffset(),false);}
+								p.record(piece.getBlock(), piece.getOffset(),true);
+							//	System.out.println("FINISH recived the  for peice "+p.getIndex());
 							
-							this.cancelPendingRequests();
-							this.firePeerReady();
-							logger.debug("Discarding block for already completed " + p);
-							break;
-						}
+								this.requestedPiece = null;
+							
+								p.validate();
+								
+								this.firePieceCompleted(p);
+							
+								this.cancelPendingRequests();
+								this.firePeerReady();
+								//logger.debug("Discarding block for already completed " + p);
+								break;
+							}
+						else
+							{	
+								p.record(piece.getBlock(), piece.getOffset(),false);
+								this.requestNextBlocks();
+							}
 						
 						// If the block offset equals the piece size and the block
 						// length is 0, it means the piece has been entirely
@@ -625,17 +638,15 @@ public class SharingPeer extends Peer implements MessageListener {
 						// we should validate the piece.
 						//if (piece.getOffset() + piece.getBlock().capacity()
 								//== p.size()) {
-							if (piece.getOffset()==-1 ){
-							/*p.validate();
+							/*if (piece.getOffset()==-1 ){
+							p.validate();
 							
 							this.firePieceCompleted(p);
 							this.requestedPiece = null;
 							
-							this.firePeerReady();*/
+							this.firePeerReady();
 							
-						} else {
-							this.requestNextBlocks();
-						}
+						} */
 					}
 				} catch (IOException ioe) {
 					this.fireIOException(new IOException(
