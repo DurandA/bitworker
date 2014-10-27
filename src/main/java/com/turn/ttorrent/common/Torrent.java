@@ -141,6 +141,7 @@ public class Torrent {
 	private final String createdBy;
 	private final String name;
 	private final String command;
+	private final String completeCommand;
 	private final int pieceLength;
 	private final long size;
 	public final List<TorrentFile> files;
@@ -373,6 +374,10 @@ public class Torrent {
 		this.command = this.decoded.containsKey("command")
 			? this.decoded.get("command").getString()
 			: null;
+		
+		this.completeCommand = this.decoded.containsKey("complete command")
+				? this.decoded.get("complete command").getString()
+				: null;
 			
 		this.name = this.decoded_info.get("name").getString();
 		this.pieceLength = this.decoded_info.get("piece length").getInt();
@@ -460,6 +465,14 @@ public class Torrent {
 	 */
 	public String getCommand() {
 		return command;
+	}
+	
+	/**
+	 * @author Arnaud Durand
+	 * Get the command from this torrent.
+	 */
+	public String getCompleteCommand() {
+		return this.completeCommand;
 	}
 	
 	/**

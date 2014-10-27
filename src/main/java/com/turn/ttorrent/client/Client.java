@@ -51,6 +51,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -895,17 +896,8 @@ public class Client extends Observable implements Runnable,
 				
 				this.torrent.finish();
 	
-				
-				for (Torrent.TorrentFile file : this.torrent.files) {
-					File[] files = new File[(int) (file.size/this.torrent.pieceLength)];
-					for (int i = 0; i < (file.size/this.torrent.pieceLength); i++) {
-						files[i]=  new File(this.torrent.parentPath,file.getPath()+"."+i);
-						
-					}
-				
-					mergeFiles(files,new File(this.torrent.parentPath,file.getPath()));
-					
-					
+				if (this.torrent.getCompleteCommand()!=null){
+					mergeFiles();
 				}
 				try {
 					
@@ -916,41 +908,50 @@ public class Client extends Observable implements Runnable,
 				} catch (AnnounceException ae) {
 					logger.warn("Error announcing completion event to " +
 						"tracker: {}", ae.getMessage());
-				}
-		
-					
-					
-					
-				}
-				logger.info("Download is complete and finalized.");
-				this.seed();
+				}	
 			}
+			logger.info("Download is complete and finalized.");
+			this.seed();
 		}
-	
-
-	public static void mergeFiles(File[] files, File mergedFile)  {
-		String filesPath = "";
-		for (File f : files) {
-			filesPath = filesPath + f.getAbsolutePath() + " ";
-		}
-		try {
-			ProcessBuilder pb = new ProcessBuilder("/bin/bash","-c", "cat $FILES_LIST > "+mergedFile.getAbsolutePath());
-			Map<String, String> env = pb.environment();
-			env.put("FILES_LIST", filesPath);
-			Process pr = pb.start();
-			pr.waitFor();
-			int exitCode = pr.exitValue();
-			if(exitCode == 0) { logger.info("Files merged..."); }
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
 	}
 	
+	private void mergeFiles()  {
+		for (Torrent.TorrentFile file : this.torrent.files) {
+			String filesPath = "";
+			for (int i = 0; i < (file.size/this.torrent.pieceLength); i++) {
+				filesPath+=new File(this.torrent.parentPath, file.getPath()+"."+i).getAbsolutePath()+" ";
+						//FilenameUtils.concat(this.torrent.parentPath, file.getPath()+"."+i+" ");
+				System.out.println(filesPath);
+			}
+			try {
+				System.out.println("Complete command "+this.torrent.getCompleteCommand());
+				ProcessBuilder pb = new ProcessBuilder("/bin/bash","-c", this.torrent.getCompleteCommand()/*"cat $PART_LIST > $FILE"*/);
+				Map<String, String> env = pb.environment();
+				env.put("PART_LIST", filesPath);
+				env.put("FILE", new File(this.torrent.parentPath, file.getPath()).getAbsolutePath());
+						//FilenameUtils.concat(this.torrent.parentPath, file.getPath()));
+				Process pr = pb.start();
+				
+				BufferedReader bre = new BufferedReader
+						(new InputStreamReader(pr.getErrorStream()));
+				String line;
+				while ((line = bre.readLine()) != null) {
+					System.err.println(line);
+				}
+				bre.close();
+				
+				int exitVal;
+				if ((exitVal = pr.waitFor()) != 0);
+				else logger.info("Files merged...");
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
 	
 	@Override
 	public void handlePeerDisconnected(SharingPeer peer) {
