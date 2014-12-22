@@ -1,0 +1,1 @@
+d7:command46:dd if=/dev/zero bs=1024 count=1024 && sleep 607:comment20:Sample rainbow table10:created by13:Arnaud Durand13:creation datei1383590205e4:infod5:filesld6:lengthi268435456e4:pathl8:zero.bineee4:name8:rbtables12:piece lengthi1048576ee8:announce36:udp://open.demonii.com:1337/announcee
